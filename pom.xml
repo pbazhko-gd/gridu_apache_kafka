@@ -20,6 +20,7 @@
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <lombok.version>1.18.36</lombok.version>
         <logback.version>1.5.20</logback.version>
+        <guice.version>7.0.0</guice.version>
         <common.version>1.0</common.version>
     </properties>
 
@@ -78,6 +79,11 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

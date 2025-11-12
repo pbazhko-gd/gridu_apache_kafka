@@ -1,5 +1,7 @@
 package com.griddynamics.gridu.pbazhko.service;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -8,11 +10,12 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 @Slf4j
-@RequiredArgsConstructor
+@Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class GitHubAccountsPublishingService {
 
-    private final KafkaProducer<String, GitHubAccount> kafkaProducer;
     private final GitHubAccountsProvidingService accountsProvidingService;
+    private final KafkaProducer<String, GitHubAccount> kafkaProducer;
 
     public void publishToTopic(String topic) {
         accountsProvidingService.findAll()

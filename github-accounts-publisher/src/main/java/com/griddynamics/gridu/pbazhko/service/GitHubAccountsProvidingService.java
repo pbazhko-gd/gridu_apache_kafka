@@ -1,5 +1,6 @@
 package com.griddynamics.gridu.pbazhko.service;
 
+import com.google.inject.Singleton;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import com.griddynamics.gridu.pbazhko.util.EnvUtil;
 import lombok.SneakyThrows;
@@ -10,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Slf4j
+@Singleton
 public class GitHubAccountsProvidingService {
 
     @SneakyThrows

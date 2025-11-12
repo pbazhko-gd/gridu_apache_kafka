@@ -12,7 +12,7 @@ import java.util.Properties;
 public class EnvUtil {
 
     private static final String PROPERTIES_FILENAME = "application.properties";
-    private static final Properties PROPERTIES = loadProperties();
+    private static final Properties PROPERTIES_FROM_CONFIG_FILE = loadProperties();
 
     private static Properties loadProperties() {
         var props = new Properties();
@@ -22,26 +22,21 @@ public class EnvUtil {
             .getResourceAsStream(PROPERTIES_FILENAME)) {
 
             if (inputStream != null) {
+                log.info("Read properties from '{}' file", PROPERTIES_FILENAME);
                 props.load(inputStream);
-                props.forEach((key, value) -> log.info("Found configuration property {}={}", key, value));
             } else {
-                log.warn("'{}' file not found", PROPERTIES_FILENAME);
+                log.warn("'{}' file was not found", PROPERTIES_FILENAME);
             }
         } catch (IOException e) {
             throw new IllegalStateException("Cannot read properties file '%s'".formatted(PROPERTIES_FILENAME), e);
         }
 
-        System.getenv().forEach((key, value) -> {
-            if (value != null && !value.isEmpty()) {
-                props.setProperty(key, value);
-            }
-        });
-
         return props;
     }
 
     public static String getConfig(String key) {
-        return Optional.ofNullable(PROPERTIES.getProperty(key))
-            .orElseThrow(() -> new RuntimeException("Property key '%s' not found".formatted(key)));
+        return Optional.ofNullable(
+            System.getenv().getOrDefault(key, PROPERTIES_FROM_CONFIG_FILE.getProperty(key))
+        ).orElseThrow(() -> new RuntimeException("Property key '%s' not found".formatted(key)));
     }
 }
