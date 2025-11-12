@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.litmos.gridu.ilyavy</groupId>
+        <groupId>com.griddynamics.gridu.pbazhko</groupId>
         <artifactId>github-metrics</artifactId>
         <version>1.0</version>
     </parent>
@@ -24,7 +24,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.litmos.gridu.ilyavy</groupId>
+            <groupId>com.griddynamics.gridu.pbazhko</groupId>
             <artifactId>github-accounts-analyzer</artifactId>
             <version>1.0</version>
         </dependency>
