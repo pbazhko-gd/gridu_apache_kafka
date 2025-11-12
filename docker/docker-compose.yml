@@ -62,17 +62,29 @@ services:
     ports:
       - 8081:8081
     depends_on:
-      - zookeeper
       - kafka1
       - kafka2
-    volumes:
-      - ./schema-registry-scripts:/scripts
     environment:
       TZ: ${TZ_SET}
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092
       SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: "none"
       SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: "WARN"
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: ghcr.io/kafbat/kafka-ui:latest
+    depends_on:
+      - kafka1
+      - kafka2
+    ports:
+      - 8082:8082
+    environment:
+      SERVER_PORT: 8082
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: 'gridu-kafka-local-cluster'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka1:9092,kafka2:9092'
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: 'http://schema-registry:8081'
 
 #  ksqldb-server:
 #    image: confluentinc/cp-ksqldb-server:${KSQLDB_VER}
