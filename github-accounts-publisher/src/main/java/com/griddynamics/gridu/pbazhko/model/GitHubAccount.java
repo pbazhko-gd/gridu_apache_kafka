@@ -10,4 +10,7 @@ public class GitHubAccount {
 
     @JsonProperty(required = true)
     private String name;
+
+    @JsonProperty(required = true)
+    private String interval;
 }

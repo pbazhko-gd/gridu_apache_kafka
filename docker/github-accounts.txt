@@ -1,5 +1,5 @@
-pbazhko
-pbazhko-gd
-tfedorov
-birdayz
-fuyar
+pbazhko,1w
+pbazhko-gd,1d
+tfedorov,8h
+birdayz,2w
+fuyar,3d

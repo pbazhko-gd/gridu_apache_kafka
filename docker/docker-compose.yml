@@ -97,6 +97,7 @@ services:
       KAFKA_SCHEMA_REGISTRY: http://schema-registry:8081
       KAFKA_SCHEMA_AUTO_REGISTER: true
       KAFKA_PRODUCER_CLIENT_ID: github-accounts-publisher
+      KAFKA_ENABLE_IDEMPOTENCE: true
       KAFKA_GITHUB_ACCOUNTS_TOPIC: github-accounts
       GITHUB_ACCOUNTS_LIST_FILENAME: /tmp/github-accounts.txt
 

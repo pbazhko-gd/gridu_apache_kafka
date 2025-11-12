@@ -36,6 +36,7 @@ public class KafkaProducerFactory {
         properties.put(BOOTSTRAP_SERVERS_CONFIG, EnvUtil.getConfig("KAFKA_BOOTSTRAP_SERVERS"));
         properties.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.put(VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
+        properties.put(ENABLE_IDEMPOTENCE_CONFIG, EnvUtil.getConfig("KAFKA_ENABLE_IDEMPOTENCE"));
         properties.put(SCHEMA_REGISTRY_URL_CONFIG, EnvUtil.getConfig("KAFKA_SCHEMA_REGISTRY"));
         properties.put(AUTO_REGISTER_SCHEMAS_CONFIG, EnvUtil.getConfig("KAFKA_SCHEMA_AUTO_REGISTER"));
         return properties;

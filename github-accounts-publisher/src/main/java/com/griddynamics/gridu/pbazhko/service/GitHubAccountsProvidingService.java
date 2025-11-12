@@ -18,7 +18,8 @@ public class GitHubAccountsProvidingService {
         return Files.readAllLines(Paths.get(filename))
             .stream()
             .map(String::trim)
-            .map(GitHubAccount::new)
+            .map(line->line.split(","))
+            .map(data -> new GitHubAccount(data[0], data[1]))
             .toList();
     }
 }
