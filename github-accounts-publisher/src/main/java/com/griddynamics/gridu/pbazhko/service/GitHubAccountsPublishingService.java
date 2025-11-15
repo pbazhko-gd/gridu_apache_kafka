@@ -1,31 +1,32 @@
 package com.griddynamics.gridu.pbazhko.service;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
+@Service
+@RequiredArgsConstructor
 public class GitHubAccountsPublishingService {
 
-    private final GitHubAccountsProvidingService accountsProvidingService;
+    @Value("${KAFKA_GITHUB_ACCOUNTS_TOPIC}")
+    private String accountsTopic;
+
+    private final GitHubAccountsReadingService gitHubAccountsReadingService;
     private final KafkaProducer<String, GitHubAccount> kafkaProducer;
 
-    public void publishToTopic(String topic) {
-        accountsProvidingService.findAll()
-            .forEach(account -> publishAccount(topic, account));
+    public void publish() {
+        gitHubAccountsReadingService.readAll()
+            .forEach(this::publishAccount);
     }
 
-    @SneakyThrows
-    private void publishAccount(String topic, GitHubAccount account) {
+    private void publishAccount(GitHubAccount account) {
         var key = String.valueOf(account.getName().charAt(0));
-        var record = new ProducerRecord<String, GitHubAccount>(topic, key, account);
+        var record = new ProducerRecord<>(accountsTopic, key, account);
         kafkaProducer.send(record, (data, error) -> {
             if (error == null) {
                 log.info("Write to partition: {}", data.partition());
