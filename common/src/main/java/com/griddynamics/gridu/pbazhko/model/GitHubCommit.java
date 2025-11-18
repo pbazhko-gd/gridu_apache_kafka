@@ -2,11 +2,15 @@ package com.griddynamics.gridu.pbazhko.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class GitHubCommit {
 
@@ -16,7 +20,7 @@ public class GitHubCommit {
     @JsonProperty(required = true)
     private LocalDateTime dateTimeUtc;
 
-    @JsonProperty(required = true)
+    @JsonProperty(required = false)
     private String language;
 
     @JsonProperty(required = true)

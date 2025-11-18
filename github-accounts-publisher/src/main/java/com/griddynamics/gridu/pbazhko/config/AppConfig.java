@@ -24,9 +24,10 @@ public class AppConfig {
     private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
     private static final String AUTO_REGISTER_SCHEMAS_CONFIG = "auto.register.schemas";
 
-    @Bean(destroyMethod = "close")
-    public KafkaProducer<String, GitHubAccount> kafkaProducer(Environment env) {
-        return new KafkaProducer<>(getProperties(env));
+    @Bean
+    public KafkaProducerHolder kafkaProducerHolder(Environment env) {
+        var kafkaProducer = new KafkaProducer<String, GitHubAccount>(getProperties(env));
+        return new KafkaProducerHolder(kafkaProducer);
     }
 
     private static Properties getProperties(Environment env) {
@@ -36,6 +37,7 @@ public class AppConfig {
         properties.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.put(VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
         properties.put(ENABLE_IDEMPOTENCE_CONFIG, env.getProperty("KAFKA_ENABLE_IDEMPOTENCE"));
+        properties.put(ACKS_CONFIG, env.getProperty("KAFKA_PRODUCER_ACKS"));
         properties.put(SCHEMA_REGISTRY_URL_CONFIG, env.getProperty("KAFKA_SCHEMA_REGISTRY"));
         properties.put(AUTO_REGISTER_SCHEMAS_CONFIG, env.getProperty("KAFKA_SCHEMA_AUTO_REGISTER"));
         return properties;

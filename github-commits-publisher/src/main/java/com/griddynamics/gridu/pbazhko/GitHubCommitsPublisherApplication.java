@@ -8,7 +8,9 @@ public class GitHubCommitsPublisherApplication {
 
     public static void main(String[] args) {
         var context = new AnnotationConfigApplicationContext(AppConfig.class);
-        var service = context.getBean(GitHubAccountsProcessingService.class);
-        service.process();
+        try (context) {
+            var service = context.getBean(GitHubAccountsProcessingService.class);
+            service.process();
+        }
     }
 }

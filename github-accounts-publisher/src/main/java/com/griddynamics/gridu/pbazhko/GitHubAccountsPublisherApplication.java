@@ -10,7 +10,9 @@ public class GitHubAccountsPublisherApplication {
 
     public static void main(String[] args) {
         var context = new AnnotationConfigApplicationContext(AppConfig.class);
-        var service = context.getBean(GitHubAccountsPublishingService.class);
-        service.publish();
+        try (context) {
+            var service = context.getBean(GitHubAccountsPublishingService.class);
+            service.publish();
+        }
     }
 }
