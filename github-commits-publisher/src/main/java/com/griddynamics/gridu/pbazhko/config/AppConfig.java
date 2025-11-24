@@ -1,24 +1,33 @@
 package com.griddynamics.gridu.pbazhko.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverOptions;
 import reactor.netty.http.client.HttpClient;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 @Slf4j
@@ -32,9 +41,10 @@ public class AppConfig {
     private static final String JSON_VALUE_TYPE_CONFIG = "json.value.type";
 
     @Bean
-    public KafkaConsumerHolder kafkaConsumerHolder(Environment env) {
-        var kafkaConsumer = new KafkaConsumer<String, GitHubAccount>(getConsumerProperties(env));
-        return new KafkaConsumerHolder(kafkaConsumer);
+    public KafkaReceiver<String, GitHubAccount> kafkaReceiver(Environment env) {
+        var receiverOptions = ReceiverOptions.<String, GitHubAccount>create(getConsumerProperties(env))
+            .subscription(Collections.singletonList(env.getProperty("KAFKA_GITHUB_ACCOUNTS_TOPIC")));
+        return KafkaReceiver.create(receiverOptions);
     }
 
     @Bean
@@ -52,7 +62,16 @@ public class AppConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        var mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
+
+    @Bean
+    public List<String> blockedGitHubRepositories(
+        @Value("classpath:github-repos-blacklist.txt") Resource resource
+    ) throws IOException {
+        return new ArrayList<>(Files.readAllLines(resource.getFile().toPath()));
     }
 
     private static Properties getConsumerProperties(Environment env) {
