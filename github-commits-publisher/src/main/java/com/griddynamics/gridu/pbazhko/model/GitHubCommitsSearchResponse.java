@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GitHubSearchResponse {
+public class GitHubCommitsSearchResponse {
 
     @JsonProperty("total_count")
     private int totalCount;

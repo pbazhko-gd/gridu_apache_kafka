@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.griddynamics.gridu.pbazhko" level="debug"/>
+    <logger name="com.griddynamics.gridu.pbazhko" level="trace"/>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

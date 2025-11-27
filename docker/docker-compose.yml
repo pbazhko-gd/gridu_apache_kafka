@@ -64,6 +64,7 @@ services:
 
   schema-registry:
     image: "confluentinc/cp-schema-registry:${CONF_VER}"
+    restart: unless-stopped
     container_name: schema-registry
     ports:
       - 8081:8081
@@ -81,6 +82,7 @@ services:
   kafka-ui:
     container_name: kafka-ui
     image: ghcr.io/kafbat/kafka-ui:v1.4.2
+    restart: unless-stopped
     depends_on:
       - kafka1
       - kafka2
@@ -92,6 +94,15 @@ services:
       KAFKA_CLUSTERS_0_NAME: gridu-kafka-local-cluster
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092,kafka2:9092
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
+
+  redis:
+    image: redis:8.4.0-alpine
+    restart: unless-stopped
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
 
   github-accounts-publisher:
     container_name: github-accounts-publisher
@@ -131,7 +142,6 @@ services:
       KAFKA_CONSUMER_GROUP_ID: github-commits-publisher
       KAFKA_CONSUMER_AUTO_OFFSET_RESET_CONFIG: earliest
       KAFKA_CONSUMER_ENABLE_AUTOCOMMIT: false
-      CONSUMER_POLLING_TIMEOUT_MS: 10000
       GITHUB_API_BASE_URL: https://api.github.com/search/commits
 
 #  ksqldb-server:
@@ -232,4 +242,6 @@ volumes:
   kafka2:
     driver: local
   zookeeper:
+    driver: local
+  redis:
     driver: local
