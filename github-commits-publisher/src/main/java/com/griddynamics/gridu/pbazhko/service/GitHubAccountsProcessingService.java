@@ -118,7 +118,6 @@ public class GitHubAccountsProcessingService {
     private Mono<GitHubCommitsSearchResponse> getCacheableCommitsSearchResponse(GitHubAccount account) {
         if (commitsCacheEnabled) {
             return reactiveRedisService.get(buildCacheKey(account), GitHubCommitsSearchResponse.class)
-                .publishOn(Schedulers.immediate())
                 .doOnNext(response ->
                     log.debug("Found cached GitHub commit response for account '{}'", account)
                 ).switchIfEmpty(Mono.defer(() -> {

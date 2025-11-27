@@ -37,7 +37,6 @@ public class GitHubLanguageSearchService {
     public Mono<String> getCommitLanguage(String languagesUrl) {
         if (languagesCacheEnabled) {
             return reactiveRedisService.get(languagesUrl, String.class)
-                .publishOn(Schedulers.immediate())
                 .doOnNext(response ->
                     log.debug("Found cached language '{}' for url '{}'", response, languagesUrl)
                 ).switchIfEmpty(Mono.defer(() -> {
