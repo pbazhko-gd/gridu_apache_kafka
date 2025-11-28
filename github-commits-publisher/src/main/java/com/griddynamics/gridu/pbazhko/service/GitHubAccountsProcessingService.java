@@ -16,12 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverRecord;
 import reactor.netty.http.client.HttpClient;
 
-import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -34,9 +32,6 @@ public class GitHubAccountsProcessingService {
 
     @Value("${KAFKA_GITHUB_COMMITS_TOPIC}")
     private String commitsTopic;
-
-    @Value("${COMMITS_CACHE_ENABLED}")
-    private boolean commitsCacheEnabled;
 
     private final HttpClient gitHubHttpClient;
     private final ObjectMapper objectMapper;
@@ -91,7 +86,7 @@ public class GitHubAccountsProcessingService {
 
     public Flux<GitHubCommit> getCommits(GitHubAccount account) {
         log.trace("Start retrieving commits for account '{}'", account);
-        return getCacheableCommitsSearchResponse(account)
+        return getCommitsSearchResponse(account)
             .doOnNext(response -> log.info("Found {} commits for '{}'", response.getItems().length, account.getName()))
             .flatMapMany(gitHubCommitsSearchResponse -> Flux.fromArray(gitHubCommitsSearchResponse.getItems()))
             .filter(this::isRepositoryTrusted)
@@ -112,25 +107,6 @@ public class GitHubAccountsProcessingService {
         } else {
             log.debug("Commit accepted from a trusted repository '{}'", repositoryFullName);
             return true;
-        }
-    }
-
-    private Mono<GitHubCommitsSearchResponse> getCacheableCommitsSearchResponse(GitHubAccount account) {
-        if (commitsCacheEnabled) {
-            return reactiveRedisService.get(buildCacheKey(account), GitHubCommitsSearchResponse.class)
-                .doOnNext(response ->
-                    log.debug("Found cached GitHub commit response for account '{}'", account)
-                ).switchIfEmpty(Mono.defer(() -> {
-                    log.debug("No cached GitHub commit response for account '{}'", account);
-                    return getCommitsSearchResponse(account)
-                        .flatMap(resp -> {
-                            log.debug("Cache GitHub commit response for account '{}'", account);
-                            return reactiveRedisService.set(buildCacheKey(account), resp, Duration.ofDays(1))
-                                .thenReturn(resp);
-                        });
-                }));
-        } else {
-            return getCommitsSearchResponse(account);
         }
     }
 
