@@ -6,3 +6,5 @@
 target/
 commits-metrics-kafka-stream/src/test/target/
 .DS_Store
+docker/kafka_connect_plugins/
+dependency-reduced-pom.xml

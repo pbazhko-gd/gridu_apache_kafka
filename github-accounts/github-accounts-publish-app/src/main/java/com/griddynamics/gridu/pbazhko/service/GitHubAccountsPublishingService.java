@@ -22,18 +22,21 @@ public class GitHubAccountsPublishingService {
     public void publish() {
         gitHubAccountsReadingService.readAll()
             .forEach(this::publishAccount);
-        kafkaProducerHolder.getKafkaProducer().flush();
     }
 
     private void publishAccount(GitHubAccount account) {
+
+        log.debug("Start processing account '{}'", account);
+
         var key = String.valueOf(account.getName().charAt(0));
         var record = new ProducerRecord<>(accountsTopic, key, account);
+
         kafkaProducerHolder.getKafkaProducer()
             .send(record, (data, error) -> {
                 if (error == null) {
-                    log.info("Write to partition: {}", data.partition());
+                    log.debug("Write account '{}' to partition: {}", account, data.partition());
                 } else {
-                    log.error("Cannot write to Kafka", error);
+                    log.error("Cannot write account '{}' to Kafka", account, error);
                 }
             });
     }

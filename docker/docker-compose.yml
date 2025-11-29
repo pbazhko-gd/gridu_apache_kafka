@@ -95,6 +95,36 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092,kafka2:9092
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
 
+  kafka-connect_1:
+    image: "confluentinc/cp-kafka-connect:${CONF_VER}"
+    container_name: kafka_connect_1
+    restart: unless-stopped
+    depends_on:
+      - kafka1
+      - kafka2
+    ports:
+      - 18083:8083
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "kafka1:9092,kafka2:9092"
+      CONNECT_REST_PORT: 8083
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka_connect_1"
+      CONNECT_GROUP_ID: "kafka-connect-cluster"
+      CONNECT_CONFIG_STORAGE_TOPIC: "kafka-connect-configs"
+      CONNECT_OFFSET_STORAGE_TOPIC: "kafka-connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "kafka-connect-status"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components,/usr/local/share/kafka/plugins"
+      CONNECT_PLUGIN_DISCOVERY: "hybrid_warn"
+    volumes:
+      - ./kafka_connect_plugins:/usr/local/share/kafka/plugins
+      - ./github-accounts.txt:/data/github-accounts.txt
+
   redis:
     image: redis:8.4.0-alpine
     restart: unless-stopped
@@ -103,46 +133,6 @@ services:
       - 6379:6379
     volumes:
       - redis:/data
-
-  github-accounts-publisher:
-    container_name: github-accounts-publisher
-    image: github-accounts-publisher:latest
-    restart: no
-    depends_on:
-      - kafka1
-      - kafka2
-    volumes:
-      - ./github-accounts.txt:/tmp/github-accounts.txt
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092
-      KAFKA_SCHEMA_REGISTRY: http://schema-registry:8081
-      KAFKA_SCHEMA_AUTO_REGISTER: true
-      KAFKA_PRODUCER_CLIENT_ID: github-accounts-publisher
-      KAFKA_ENABLE_IDEMPOTENCE: true
-      KAFKA_GITHUB_ACCOUNTS_TOPIC: github-accounts
-      GITHUB_ACCOUNTS_LIST_FILENAME: /tmp/github-accounts.txt
-      KAFKA_PRODUCER_ACKS: all
-
-  github-commits-publisher:
-    container_name: github-commits-publisher
-    image: github-commits-publisher:latest
-    restart: no
-    depends_on:
-      - kafka1
-      - kafka2
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka1:9092,kafka2:9092
-      KAFKA_SCHEMA_REGISTRY: http://schema-registry:8081
-      KAFKA_SCHEMA_AUTO_REGISTER: true
-      KAFKA_PRODUCER_CLIENT_ID: github-accounts-publisher
-      KAFKA_ENABLE_IDEMPOTENCE: true
-      KAFKA_GITHUB_ACCOUNTS_TOPIC: github-accounts
-      KAFKA_GITHUB_COMMITS_TOPIC: github-commits
-      KAFKA_PRODUCER_ACKS: all
-      KAFKA_CONSUMER_GROUP_ID: github-commits-publisher
-      KAFKA_CONSUMER_AUTO_OFFSET_RESET_CONFIG: earliest
-      KAFKA_CONSUMER_ENABLE_AUTOCOMMIT: false
-      GITHUB_API_BASE_URL: https://api.github.com/search/commits
 
 #  ksqldb-server:
 #    image: confluentinc/cp-ksqldb-server:${KSQLDB_VER}

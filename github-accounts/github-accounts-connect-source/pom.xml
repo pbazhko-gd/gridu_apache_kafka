@@ -5,17 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.griddynamics.gridu.pbazhko</groupId>
-        <artifactId>github-metrics</artifactId>
+        <artifactId>github-accounts</artifactId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>github-accounts-publisher</artifactId>
+    <artifactId>github-accounts-connect-source</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jib-maven-plugin.version>3.4.6</jib-maven-plugin.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <!-- actual java version in the kafka-connect environment -->
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <build>
@@ -35,26 +35,26 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>${jib-maven-plugin.version}</version>
-                <configuration>
-                    <from>
-                        <image>eclipse-temurin:21-jre</image>
-                    </from>
-                    <to>
-                        <image>github-accounts-publisher:latest</image>
-                    </to>
-                    <container>
-                        <mainClass>com.griddynamics.gridu.pbazhko.GitHubAccountsPublisherApplication</mainClass>
-                    </container>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>dockerBuild</goal>
+                            <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <includes>
+                                        <!-- Only include specific classes or packages -->
+                                        <include>com/griddynamics/gridu/pbazhko/**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -68,11 +68,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-json-schema-serializer</artifactId>
+            <artifactId>connect-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -80,14 +76,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 </project>

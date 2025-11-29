@@ -21,9 +21,8 @@ public class GitHubAccountsReadingService {
         try {
             return Files.readAllLines(Paths.get(filename))
                 .stream()
-                .map(String::trim)
-                .map(line -> line.split(","))
-                .map(data -> new GitHubAccount(data[0], data[1]))
+                .map(GitHubAccount::fromCsvLine)
+                .distinct() // avoid potential duplicates in file
                 .toList();
         } catch (IOException e) {
             log.error("Cannot read file {}", filename, e);

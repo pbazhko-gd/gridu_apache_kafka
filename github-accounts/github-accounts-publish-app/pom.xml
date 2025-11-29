@@ -5,11 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.griddynamics.gridu.pbazhko</groupId>
-        <artifactId>github-metrics</artifactId>
+        <artifactId>github-accounts</artifactId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>github-commits-publisher</artifactId>
+    <artifactId>github-accounts-publish-app</artifactId>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>
@@ -36,6 +37,10 @@
             <artifactId>common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-json-schema-serializer</artifactId>
         </dependency>
@@ -44,7 +49,6 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -54,28 +58,6 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor.netty</groupId>
-            <artifactId>reactor-netty-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor.kafka</groupId>
-            <artifactId>reactor-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-resolver-dns-native-macos</artifactId>
-            <classifier>osx-aarch_64</classifier>
         </dependency>
     </dependencies>
 </project>
