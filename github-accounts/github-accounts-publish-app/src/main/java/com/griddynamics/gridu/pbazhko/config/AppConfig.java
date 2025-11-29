@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.config;
 
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
-import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -35,7 +35,7 @@ public class AppConfig {
         properties.put(CLIENT_ID_CONFIG, env.getProperty("KAFKA_PRODUCER_CLIENT_ID"));
         properties.put(BOOTSTRAP_SERVERS_CONFIG, env.getProperty("KAFKA_BOOTSTRAP_SERVERS"));
         properties.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.put(VALUE_SERIALIZER_CLASS_CONFIG, KafkaJsonSchemaSerializer.class.getName());
+        properties.put(VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
         properties.put(ENABLE_IDEMPOTENCE_CONFIG, env.getProperty("KAFKA_ENABLE_IDEMPOTENCE"));
         properties.put(ACKS_CONFIG, env.getProperty("KAFKA_PRODUCER_ACKS"));
         properties.put(SCHEMA_REGISTRY_URL_CONFIG, env.getProperty("KAFKA_SCHEMA_REGISTRY"));

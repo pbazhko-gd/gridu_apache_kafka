@@ -1,17 +1,17 @@
 package com.griddynamics.gridu.pbazhko.util;
 
 import lombok.experimental.UtilityClass;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.WEEKS;
+
+import static com.griddynamics.gridu.pbazhko.model.GitHubAccount.INTERVAL_PATTERN;
 
 @UtilityClass
 public class IntervalParsingUtil {
@@ -19,12 +19,8 @@ public class IntervalParsingUtil {
     private static final Map<String, ChronoUnit> UNITS =
         Map.of("h", HOURS, "d", DAYS, "w", WEEKS);
 
-    private static final Pattern DURATION_IN_TEXT_FORMAT = Pattern.compile("^([\\+\\-]?\\d+)([a-zA-Z]{1,2})$");
-
     public static LocalDateTime getStartDateTime(String interval) {
-        var matcher = DURATION_IN_TEXT_FORMAT.matcher(interval);
-        Assert.isTrue(matcher.matches(),
-            "Interval is malformed, it should be in format <number><unit>, e.g. 3h, 1d, 5w");
+        var matcher = INTERVAL_PATTERN.matcher(interval);
 
         var amount = Long.parseLong(matcher.group(1));
         var unit = UNITS.get(matcher.group(2).toLowerCase());
