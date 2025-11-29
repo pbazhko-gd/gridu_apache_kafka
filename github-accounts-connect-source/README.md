@@ -1,9 +1,9 @@
 ### How to install connector
 1. Execute **mvn clean package**
-2. Move jar file to **docker/kafka_connect_plugins**
+2. Move jar file to **_docker/kafka_connect_plugins**
 3. Restart all kafka-connect containers
 4. Use the command listed below to operate with the connector
-5. GitHub accounts list is located in **docker/github-accounts.txt** file (check docker-compose.yml)
+5. GitHub accounts list is located in **_docker/github-accounts.txt** file (check docker-compose.yml)
 
 ### Get available connector plugins list
 ```bash
