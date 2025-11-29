@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -21,12 +22,22 @@ public class GitHubAccountsReadingService {
         try {
             return Files.readAllLines(Paths.get(filename))
                 .stream()
-                .map(GitHubAccount::fromCsvLine)
+                .map(this::convertToModel)
+                .filter(Objects::nonNull)
                 .distinct() // avoid potential duplicates in file
                 .toList();
         } catch (IOException e) {
             log.error("Cannot read file {}", filename, e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private GitHubAccount convertToModel(String line) {
+        try {
+            return GitHubAccount.fromCsvLine(line);
+        } catch (Exception e) {
+            log.error("Skip invalid line '{}'", line, e);
+            return null;
         }
     }
 }

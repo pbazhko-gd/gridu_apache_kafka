@@ -19,6 +19,7 @@
         <kafka-avro-serializer.version>8.1.0</kafka-avro-serializer.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <lombok.version>1.18.42</lombok.version>
+        <jackson.version>2.20.1</jackson.version>
         <logback.version>1.5.20</logback.version>
         <spring.version>7.0.0</spring.version>
         <reactor-core.version>3.8.0</reactor-core.version>
@@ -31,11 +32,9 @@
     </properties>
 
     <modules>
-        <!--        <module>github-accounts-analyzer</module>-->
-        <!--        <module>commits-metrics-kafka-stream</module>-->
-        <!--        <module>modules-integration-tests</module>-->
-        <module>github-accounts</module>
         <module>common</module>
+        <module>github-accounts-connect-source</module>
+        <module>github-accounts-publish-app</module>
         <module>github-commits-publisher</module>
     </modules>
 
@@ -52,11 +51,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.griddynamics.gridu.pbazhko</groupId>
-                <artifactId>common</artifactId>
-                <version>${common.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
@@ -83,13 +77,13 @@
                 <version>${slf4j-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
+                <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
             </dependency>
             <dependency>
@@ -97,7 +91,16 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
@@ -145,31 +148,24 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.6.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.6.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.15.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.14.1</version>
+                    <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

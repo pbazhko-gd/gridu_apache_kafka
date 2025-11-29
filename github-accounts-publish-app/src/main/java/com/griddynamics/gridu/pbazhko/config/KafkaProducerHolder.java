@@ -1,9 +1,9 @@
 package com.griddynamics.gridu.pbazhko.config;
 
-import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class KafkaProducerHolder implements AutoCloseable {
 
     @Getter
-    private final KafkaProducer<String, GitHubAccount> kafkaProducer;
+    private final KafkaProducer<String, GenericRecord> kafkaProducer;
 
     @Override
     public void close() {

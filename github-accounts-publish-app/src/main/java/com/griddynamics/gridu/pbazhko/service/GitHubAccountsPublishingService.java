@@ -4,6 +4,9 @@ import com.griddynamics.gridu.pbazhko.config.KafkaProducerHolder;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,12 +19,14 @@ public class GitHubAccountsPublishingService {
     @Value("${KAFKA_GITHUB_ACCOUNTS_TOPIC}")
     private String accountsTopic;
 
+    private final Schema gitHubAccountsSchema;
     private final GitHubAccountsReadingService gitHubAccountsReadingService;
     private final KafkaProducerHolder kafkaProducerHolder;
 
     public void publish() {
-        gitHubAccountsReadingService.readAll()
-            .forEach(this::publishAccount);
+        var accounts = gitHubAccountsReadingService.readAll();
+        log.info("Found {} GitHub account(s)", accounts.size());
+        accounts.forEach(this::publishAccount);
     }
 
     private void publishAccount(GitHubAccount account) {
@@ -29,10 +34,15 @@ public class GitHubAccountsPublishingService {
         log.debug("Start processing account '{}'", account);
 
         var key = String.valueOf(account.getName().charAt(0));
-        var record = new ProducerRecord<>(accountsTopic, key, account);
+
+        GenericRecord avroRecord = new GenericData.Record(gitHubAccountsSchema);
+        avroRecord.put("name", account.getName());
+        avroRecord.put("interval", account.getInterval());
+
+        var producerRecord = new ProducerRecord<>(accountsTopic, key, avroRecord);
 
         kafkaProducerHolder.getKafkaProducer()
-            .send(record, (data, error) -> {
+            .send(producerRecord, (data, error) -> {
                 if (error == null) {
                     log.debug("Write account '{}' to partition: {}", account, data.partition());
                 } else {
