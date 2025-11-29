@@ -1,11 +1,11 @@
 package com.griddynamics.gridu.pbazhko.task;
 
+import com.griddynamics.gridu.pbazhko.GitHubAccountAvroRecordBuilder;
+import com.griddynamics.gridu.pbazhko.GitHubAccountsSchemaProvider;
 import com.griddynamics.gridu.pbazhko.connector.GitHubAccountsSourceConnector;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
-import org.apache.kafka.connect.data.Struct;
+import org.apache.avro.Schema;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 
@@ -17,23 +17,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.griddynamics.gridu.pbazhko.connector.GitHubAccountsSourceConnector.SCHEMA_REGISTRY_URL;
+
 @Slf4j
 public class GitHubAccountsTask extends SourceTask {
 
     private static final int BATCH_SIZE = 10;
     private static final long TASK_DELAY_MS = 1000;
 
+    private Schema gitHubAccountSchema;
     private String topic;
     private String filePath;
+
     private BufferedReader reader;
     private long offset = 0;
-
-    private static final Schema GITHUB_ACCOUNT_SCHEMA =
-        SchemaBuilder.struct()
-            .name(GitHubAccount.class.getName())
-            .field("name", Schema.STRING_SCHEMA)
-            .field("interval", Schema.STRING_SCHEMA)
-            .build();
 
     @Override
     public String version() {
@@ -42,13 +39,12 @@ public class GitHubAccountsTask extends SourceTask {
 
     @Override
     public void start(Map<String, String> props) {
-
-        filePath = props.get(GitHubAccountsSourceConnector.GITHUB_ACCOUNTS_FILE_PATH);
-        topic = props.get(GitHubAccountsSourceConnector.GITHUB_ACCOUNTS_TOPIC);
-
         log.info("Start GitHub accounts source connector task with props '{}'", props);
-
         try {
+            filePath = props.get(GitHubAccountsSourceConnector.GITHUB_ACCOUNTS_FILE_PATH);
+            topic = props.get(GitHubAccountsSourceConnector.GITHUB_ACCOUNTS_TOPIC);
+            gitHubAccountSchema = GitHubAccountsSchemaProvider.getSchema(topic, props.get(SCHEMA_REGISTRY_URL));
+
             reader = new BufferedReader(new FileReader(filePath));
             var savedOffset = context.offsetStorageReader()
                 .offset(Collections.singletonMap("file", filePath));
@@ -79,18 +75,7 @@ public class GitHubAccountsTask extends SourceTask {
                     log.info("Read new GitHub account '{}'", gitHubAccount);
                 }
 
-                var key = String.valueOf(gitHubAccount.getName().charAt(0));
-
-                var sourceRecord = new SourceRecord(
-                    Collections.singletonMap("file", filePath),
-                    Collections.singletonMap("position", offset),
-                    topic,
-                    null,
-                    null,
-                    key,
-                    GITHUB_ACCOUNT_SCHEMA,
-                    toStruct(gitHubAccount)
-                );
+                var sourceRecord = getSourceRecord(gitHubAccount);
                 records.add(sourceRecord);
 
                 if (records.size() >= BATCH_SIZE) {
@@ -124,9 +109,20 @@ public class GitHubAccountsTask extends SourceTask {
         }
     }
 
-    private static Struct toStruct(GitHubAccount account) {
-        return new Struct(GITHUB_ACCOUNT_SCHEMA)
-            .put("name", account.getName())
-            .put("interval", account.getInterval());
+    private SourceRecord getSourceRecord(GitHubAccount gitHubAccount) {
+        var avroRecord = GitHubAccountAvroRecordBuilder.build(gitHubAccountSchema, gitHubAccount);
+        var key = String.valueOf(gitHubAccount.getName().charAt(0));
+
+        return new SourceRecord(
+            Collections.singletonMap("file", filePath),
+            Collections.singletonMap("position", offset),
+            topic,
+            null,
+            null,
+            key,
+            null,
+            avroRecord,
+            null
+        );
     }
 }

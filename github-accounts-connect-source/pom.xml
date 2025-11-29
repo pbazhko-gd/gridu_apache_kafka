@@ -49,15 +49,17 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.griddynamics.gridu.pbazhko</groupId>
+            <artifactId>github-accounts-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.griddynamics.gridu.pbazhko</groupId>
-            <artifactId>common</artifactId>
-            <version>1.0</version>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-api</artifactId>

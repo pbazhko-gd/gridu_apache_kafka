@@ -20,8 +20,10 @@ public class GitHubAccountsSourceConnector extends SourceConnector {
 
     public static final String GITHUB_ACCOUNTS_FILE_PATH = "github.accounts.file.path";
     public static final String GITHUB_ACCOUNTS_TOPIC = "github.accounts.topic";
+    public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
 
     static final ConfigDef CONFIG_DEF = new ConfigDef()
+        .define(SCHEMA_REGISTRY_URL, STRING, null, HIGH, "Schema registry URL")
         .define(GITHUB_ACCOUNTS_FILE_PATH, STRING, null, HIGH, "Path to the file with the GitHub accounts list")
         .define(GITHUB_ACCOUNTS_TOPIC, STRING, null, HIGH, "Target Kafka topic to push GitHub accounts");
 

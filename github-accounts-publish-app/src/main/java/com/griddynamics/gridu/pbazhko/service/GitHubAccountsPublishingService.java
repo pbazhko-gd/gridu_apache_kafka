@@ -1,12 +1,11 @@
 package com.griddynamics.gridu.pbazhko.service;
 
+import com.griddynamics.gridu.pbazhko.GitHubAccountAvroRecordBuilder;
 import com.griddynamics.gridu.pbazhko.config.KafkaProducerHolder;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,10 +33,7 @@ public class GitHubAccountsPublishingService {
         log.debug("Start processing account '{}'", account);
 
         var key = String.valueOf(account.getName().charAt(0));
-
-        GenericRecord avroRecord = new GenericData.Record(gitHubAccountsSchema);
-        avroRecord.put("name", account.getName());
-        avroRecord.put("interval", account.getInterval());
+        var avroRecord = GitHubAccountAvroRecordBuilder.build(gitHubAccountsSchema, account);
 
         var producerRecord = new ProducerRecord<>(accountsTopic, key, avroRecord);
 

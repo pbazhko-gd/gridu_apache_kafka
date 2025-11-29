@@ -43,6 +43,8 @@ curl -X POST http://localhost:18083/connectors \
         "github.accounts.file.path": "/data/github-accounts.txt",
         "github.accounts.topic": "github-accounts",
         
+        "schema.registry.url": "http://schema-registry:8081",
+        
         "key.converter": "org.apache.kafka.connect.storage.StringConverter",
         "key.converter.schemas.enable": "false",
 

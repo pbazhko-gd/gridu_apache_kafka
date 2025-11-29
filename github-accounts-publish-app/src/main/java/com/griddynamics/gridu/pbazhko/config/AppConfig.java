@@ -1,7 +1,6 @@
 package com.griddynamics.gridu.pbazhko.config;
 
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import com.griddynamics.gridu.pbazhko.GitHubAccountsSchemaProvider;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
@@ -14,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
-import java.io.IOException;
 import java.util.Properties;
 
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
@@ -35,11 +33,11 @@ public class AppConfig {
     }
 
     @Bean
-    public Schema gitHubAccountsSchema(Environment env) throws RestClientException, IOException {
-        var subject = env.getProperty("KAFKA_GITHUB_ACCOUNTS_TOPIC") + "-value";
-        var schemaRegistry = new CachedSchemaRegistryClient(env.getProperty("KAFKA_SCHEMA_REGISTRY"), 10);
-        var latestVersionId = schemaRegistry.getLatestSchemaMetadata(subject).getId();
-        return new Schema.Parser().parse(schemaRegistry.getSchemaBySubjectAndId(subject, latestVersionId).toString());
+    public Schema gitHubAccountsSchema(Environment env) {
+        return GitHubAccountsSchemaProvider.getSchema(
+            env.getProperty("KAFKA_GITHUB_ACCOUNTS_TOPIC"),
+            env.getProperty("KAFKA_SCHEMA_REGISTRY")
+        );
     }
 
     private static Properties getProperties(Environment env) {
