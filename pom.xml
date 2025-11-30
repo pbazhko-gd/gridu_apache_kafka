@@ -16,8 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <itest-name-template>**/*IT.java</itest-name-template>
         <kafka.version>3.9.0</kafka.version>
-        <avro.version>1.12.1</avro.version>
-        <kafka-avro-serializer.version>8.1.0</kafka-avro-serializer.version>
+        <confluent.version>7.9.5</confluent.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <lombok.version>1.18.42</lombok.version>
         <jackson.version>2.20.1</jackson.version>
@@ -34,7 +33,6 @@
 
     <modules>
         <module>common</module>
-        <module>github-accounts-common</module>
         <module>github-accounts-connect-source</module>
         <module>github-accounts-publish-app</module>
         <module>github-commits-publisher</module>
@@ -64,25 +62,11 @@
                 <version>${kafka.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro</artifactId>
-                <version>${avro.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.confluent</groupId>
-                <artifactId>kafka-avro-serializer</artifactId>
-                <version>${kafka-avro-serializer.version}</version>
+                <artifactId>kafka-json-schema-serializer</artifactId>
+                <version>${confluent.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.confluent</groupId>
-                <artifactId>kafka-schema-registry-client</artifactId>
-                <version>${kafka-avro-serializer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-streams</artifactId>
-                <version>${kafka.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -98,11 +82,13 @@
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
@@ -113,6 +99,7 @@
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
@@ -140,11 +127,13 @@
                 <version>${netty.version}</version>
                 <classifier>osx-aarch_64</classifier>
             </dependency>
+
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
                 <version>${jedis.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>

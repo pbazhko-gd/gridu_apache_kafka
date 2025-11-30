@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
@@ -80,7 +79,7 @@ public class GitHubLanguageSearchService {
                 }
                 var entries = new ArrayList<>(languages.entrySet());
                 entries.sort(Map.Entry.comparingByValue());
-                return entries.getLast().getKey();
+                return entries.get(entries.size() - 1).getKey();
             });
     }
 }

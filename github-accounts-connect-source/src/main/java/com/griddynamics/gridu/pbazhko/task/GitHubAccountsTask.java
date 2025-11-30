@@ -1,11 +1,11 @@
 package com.griddynamics.gridu.pbazhko.task;
 
-import com.griddynamics.gridu.pbazhko.GitHubAccountAvroRecordBuilder;
-import com.griddynamics.gridu.pbazhko.GitHubAccountsSchemaProvider;
 import com.griddynamics.gridu.pbazhko.connector.GitHubAccountsSourceConnector;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.Schema;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 
@@ -17,20 +17,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.griddynamics.gridu.pbazhko.connector.GitHubAccountsSourceConnector.SCHEMA_REGISTRY_URL;
-
 @Slf4j
 public class GitHubAccountsTask extends SourceTask {
 
     private static final int BATCH_SIZE = 10;
     private static final long TASK_DELAY_MS = 1000;
 
-    private Schema gitHubAccountSchema;
     private String topic;
     private String filePath;
 
     private BufferedReader reader;
     private long offset = 0;
+
+    private final Schema schema = SchemaBuilder.struct()
+        .name("Git Hub Account")
+        .field("name", Schema.STRING_SCHEMA)
+        .field("interval", Schema.STRING_SCHEMA)
+        .build();
 
     @Override
     public String version() {
@@ -43,7 +46,6 @@ public class GitHubAccountsTask extends SourceTask {
         try {
             filePath = props.get(GitHubAccountsSourceConnector.GITHUB_ACCOUNTS_FILE_PATH);
             topic = props.get(GitHubAccountsSourceConnector.GITHUB_ACCOUNTS_TOPIC);
-            gitHubAccountSchema = GitHubAccountsSchemaProvider.getSchema(topic, props.get(SCHEMA_REGISTRY_URL));
 
             reader = new BufferedReader(new FileReader(filePath));
             var savedOffset = context.offsetStorageReader()
@@ -86,7 +88,7 @@ public class GitHubAccountsTask extends SourceTask {
                 Thread.sleep(TASK_DELAY_MS);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred in GitHub accounts source connector task", e);
         }
         return records;
     }
@@ -110,8 +112,10 @@ public class GitHubAccountsTask extends SourceTask {
     }
 
     private SourceRecord getSourceRecord(GitHubAccount gitHubAccount) {
-        var avroRecord = GitHubAccountAvroRecordBuilder.build(gitHubAccountSchema, gitHubAccount);
         var key = String.valueOf(gitHubAccount.getName().charAt(0));
+        var value = new Struct(schema)
+            .put("name", gitHubAccount.getName())
+            .put("interval", gitHubAccount.getInterval());
 
         return new SourceRecord(
             Collections.singletonMap("file", filePath),
@@ -120,9 +124,8 @@ public class GitHubAccountsTask extends SourceTask {
             null,
             null,
             key,
-            null,
-            avroRecord,
-            null
+            schema,
+            value
         );
     }
 }

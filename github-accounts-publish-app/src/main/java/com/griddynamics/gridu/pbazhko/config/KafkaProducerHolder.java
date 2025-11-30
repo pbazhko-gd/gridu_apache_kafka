@@ -3,17 +3,16 @@ package com.griddynamics.gridu.pbazhko.config;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaProducerHolder implements AutoCloseable {
+public class KafkaProducerHolder<K, V> implements AutoCloseable {
 
     @Getter
-    private final KafkaProducer<String, GenericRecord> kafkaProducer;
+    private final KafkaProducer<K, V> kafkaProducer;
 
     @Override
     public void close() {

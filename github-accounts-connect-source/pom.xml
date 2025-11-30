@@ -12,12 +12,6 @@
     <artifactId>github-accounts-connect-source</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <!-- actual java version in the kafka-connect environment -->
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -50,7 +44,7 @@
     <dependencies>
         <dependency>
             <groupId>com.griddynamics.gridu.pbazhko</groupId>
-            <artifactId>github-accounts-common</artifactId>
+            <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
 

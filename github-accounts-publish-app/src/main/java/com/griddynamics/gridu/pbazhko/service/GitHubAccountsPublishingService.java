@@ -1,11 +1,9 @@
 package com.griddynamics.gridu.pbazhko.service;
 
-import com.griddynamics.gridu.pbazhko.GitHubAccountAvroRecordBuilder;
 import com.griddynamics.gridu.pbazhko.config.KafkaProducerHolder;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.Schema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,9 +16,8 @@ public class GitHubAccountsPublishingService {
     @Value("${KAFKA_GITHUB_ACCOUNTS_TOPIC}")
     private String accountsTopic;
 
-    private final Schema gitHubAccountsSchema;
     private final GitHubAccountsReadingService gitHubAccountsReadingService;
-    private final KafkaProducerHolder kafkaProducerHolder;
+    private final KafkaProducerHolder<String, GitHubAccount> kafkaProducerHolder;
 
     public void publish() {
         var accounts = gitHubAccountsReadingService.readAll();
@@ -33,9 +30,7 @@ public class GitHubAccountsPublishingService {
         log.debug("Start processing account '{}'", account);
 
         var key = String.valueOf(account.getName().charAt(0));
-        var avroRecord = GitHubAccountAvroRecordBuilder.build(gitHubAccountsSchema, account);
-
-        var producerRecord = new ProducerRecord<>(accountsTopic, key, avroRecord);
+        var producerRecord = new ProducerRecord<>(accountsTopic, key, account);
 
         kafkaProducerHolder.getKafkaProducer()
             .send(producerRecord, (data, error) -> {

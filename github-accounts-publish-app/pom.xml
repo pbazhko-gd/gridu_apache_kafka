@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.griddynamics.gridu.pbazhko</groupId>
-            <artifactId>github-accounts-common</artifactId>
+            <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
 
@@ -29,6 +29,10 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-json-schema-serializer</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -40,6 +44,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>

@@ -5,6 +5,20 @@
 4. Use the command listed below to operate with the connector
 5. GitHub accounts list is located in **_docker/github-accounts.txt** file (check docker-compose.yml)
 
+### Listen to Kafka topic
+```bash
+docker exec -it kafka1 kafka-console-consumer \
+--bootstrap-server :9092 \
+--topic github-accounts \
+#--from-beginning \
+--property print.headers=false \
+--property print.timestamp=false \
+--property print.partition=false \
+--property print.offset=true \
+--property print.key=true \
+--property print.value=true 
+```
+
 ### Get available connector plugins list
 ```bash
 curl http://localhost:18083/connector-plugins
@@ -42,15 +56,12 @@ curl -X POST http://localhost:18083/connectors \
 
         "github.accounts.file.path": "/data/github-accounts.txt",
         "github.accounts.topic": "github-accounts",
-        
-        "schema.registry.url": "http://schema-registry:8081",
-        
-        "key.converter": "org.apache.kafka.connect.storage.StringConverter",
-        "key.converter.schemas.enable": "false",
 
-        "value.converter": "io.confluent.connect.avro.AvroConverter",
-        "value.converter.auto.register.schemas": "true",
+        "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+
         "value.converter.schemas.enable": "true",
+        "value.converter": "io.confluent.connect.json.JsonSchemaConverter",
+        "value.converter.auto.register.schemas": "true",
         "value.converter.schema.registry.url": "http://schema-registry:8081"
     }
 }'
