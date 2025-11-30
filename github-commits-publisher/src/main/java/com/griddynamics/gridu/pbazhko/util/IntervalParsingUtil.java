@@ -21,6 +21,9 @@ public class IntervalParsingUtil {
 
     public static LocalDateTime getStartDateTime(String interval) {
         var matcher = INTERVAL_PATTERN.matcher(interval);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Unknown interval " + interval);
+        }
 
         var amount = Long.parseLong(matcher.group(1));
         var unit = UNITS.get(matcher.group(2).toLowerCase());
