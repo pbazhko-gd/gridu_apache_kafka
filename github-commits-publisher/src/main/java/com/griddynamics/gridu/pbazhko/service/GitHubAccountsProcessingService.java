@@ -80,7 +80,7 @@ public class GitHubAccountsProcessingService {
 
     private void publishCommit(GitHubCommit gitHubCommit) {
         log.info("Prepare commit to publish to Kafka '{}'", gitHubCommit);
-        var record = new ProducerRecord<>(commitsTopic, gitHubCommit.getSha(), gitHubCommit);
+        var record = new ProducerRecord<>(commitsTopic, gitHubCommit.getAuthor(), gitHubCommit);
         kafkaProducerHolder.getKafkaProducer().send(record);
     }
 
@@ -152,9 +152,5 @@ public class GitHubAccountsProcessingService {
             .repositoryFullName(item.getRepository().getFullName())
             .language(item.getLanguage())
             .build();
-    }
-
-    private String buildCacheKey(GitHubAccount account) {
-        return "%s|%s".formatted(account.getName(), account.getInterval());
     }
 }
