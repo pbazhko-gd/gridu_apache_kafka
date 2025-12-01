@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GitHubAccountsPublishingService {
 
+    @Value("${GITHUB_ACCOUNTS_LIST_FILENAME}")
+    private String filename;
+
     @Value("${KAFKA_GITHUB_ACCOUNTS_TOPIC}")
     private String accountsTopic;
 
@@ -20,7 +23,7 @@ public class GitHubAccountsPublishingService {
     private final KafkaProducerHolder<String, GitHubAccount> kafkaProducerHolder;
 
     public void publish() {
-        var accounts = gitHubAccountsReadingService.readAll();
+        var accounts = gitHubAccountsReadingService.readAll(filename);
         log.info("Found {} GitHub account(s)", accounts.size());
         accounts.forEach(this::publishAccount);
     }

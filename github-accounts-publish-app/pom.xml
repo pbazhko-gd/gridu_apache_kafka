@@ -49,5 +49,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.griddynamics.gridu.pbazhko</groupId>
+            <artifactId>common-tests</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
