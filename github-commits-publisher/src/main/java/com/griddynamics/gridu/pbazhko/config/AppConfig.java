@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
+import com.griddynamics.gridu.pbazhko.util.DefaultTimeProvider;
+import com.griddynamics.gridu.pbazhko.util.TimeProvider;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaDeserializer;
 import io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,6 @@ import org.springframework.core.io.Resource;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.netty.http.client.HttpClient;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
@@ -45,6 +46,11 @@ public class AppConfig {
     private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
     private static final String AUTO_REGISTER_SCHEMAS_CONFIG = "auto.register.schemas";
     private static final String JSON_VALUE_TYPE_CONFIG = "json.value.type";
+
+    @Bean
+    public TimeProvider timeProvider() {
+        return new DefaultTimeProvider();
+    }
 
     @Bean
     public JedisPool jedisPool() {

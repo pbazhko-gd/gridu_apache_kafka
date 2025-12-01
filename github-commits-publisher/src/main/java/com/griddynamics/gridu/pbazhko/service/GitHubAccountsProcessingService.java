@@ -7,8 +7,7 @@ import com.griddynamics.gridu.pbazhko.config.KafkaProducerHolder;
 import com.griddynamics.gridu.pbazhko.model.GitHubAccount;
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
 import com.griddynamics.gridu.pbazhko.model.GitHubCommitsSearchResponse;
-import com.griddynamics.gridu.pbazhko.service.cache.ReactiveRedisService;
-import com.griddynamics.gridu.pbazhko.util.IntervalParsingUtil;
+import com.griddynamics.gridu.pbazhko.util.IntervalParsingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -35,7 +34,7 @@ public class GitHubAccountsProcessingService {
 
     private final HttpClient gitHubHttpClient;
     private final ObjectMapper objectMapper;
-    private final ReactiveRedisService reactiveRedisService;
+    private final IntervalParsingService intervalParsingService;
     private final GitHubLanguageSearchService languageSearchService;
     private final List<String> blockedGitHubRepositories;
 
@@ -135,7 +134,7 @@ public class GitHubAccountsProcessingService {
     }
 
     private String buildCommitsUri(GitHubAccount account) {
-        var startDateTime = IntervalParsingUtil.getStartDateTime(account.getInterval())
+        var startDateTime = intervalParsingService.getStartDateTime(account.getInterval())
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
         var searchQuery = String.format("author:%s+author-date:>%s", account.getName(), startDateTime);
         var uri = "%s?q=%s&sort=author-date".formatted(gitHubApiBaseUrl, searchQuery);
