@@ -5,6 +5,36 @@
 4. Use the command listed below to operate with the connector
 5. GitHub accounts list is located in **_docker/github-accounts.txt** file (check docker-compose.yml)
 
+### Get existing schemas list in schema-registry
+```bash
+curl http://localhost:8081/subjects
+```
+
+### Get schema versions list in schema-registry
+```bash
+curl http://localhost:8081/subjects/github-accounts-value/versions
+```
+
+### Get schema by its version in schema-registry
+```bash
+curl http://localhost:8081/subjects/github-accounts-value/versions/7
+```
+
+### Change schema compatibility in schema-registry
+```bash
+curl -X PUT \
+  -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+  --data '{"compatibility": "NONE"}' \
+  http://localhost:8081/config/github-accounts-value
+```
+
+### Upload new schema in schema-registry
+```bash
+curl -X POST http://localhost:8081/subjects/github-accounts-value/versions \
+-H "Content-Type: application/vnd.schemaregistry.v1+json" \
+--data '{"schema": '"$(jq -Rs . < ./common/src/main/resources/github-account-schema.json)"', "schemaType": "JSON"}' 
+```
+
 ### Listen to Kafka topic
 ```bash
 docker exec -it kafka1 kafka-console-consumer \

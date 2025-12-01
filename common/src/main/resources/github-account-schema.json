@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Git Hub Account",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "interval": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "interval"
+  ]
+}

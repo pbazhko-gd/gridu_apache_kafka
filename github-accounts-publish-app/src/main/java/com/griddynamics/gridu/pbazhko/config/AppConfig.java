@@ -21,8 +21,8 @@ import static org.apache.kafka.clients.producer.ProducerConfig.*;
 @ComponentScan(basePackages = "com.griddynamics.gridu.pbazhko")
 public class AppConfig {
 
-    private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
-    private static final String AUTO_REGISTER_SCHEMAS_CONFIG = "auto.register.schemas";
+    public static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
+    public static final String AUTO_REGISTER_SCHEMAS_CONFIG = "auto.register.schemas";
 
     @Bean
     public KafkaProducerHolder<String, GitHubAccount> kafkaProducerHolder(Environment env) {
