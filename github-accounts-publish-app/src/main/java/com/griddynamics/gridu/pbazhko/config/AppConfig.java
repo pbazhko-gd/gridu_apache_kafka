@@ -13,6 +13,8 @@ import org.springframework.core.env.Environment;
 
 import java.util.Properties;
 
+import static com.griddynamics.gridu.pbazhko.constants.Constants.AUTO_REGISTER_SCHEMAS_CONFIG;
+import static com.griddynamics.gridu.pbazhko.constants.Constants.SCHEMA_REGISTRY_URL_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
 
 @Slf4j
@@ -20,9 +22,6 @@ import static org.apache.kafka.clients.producer.ProducerConfig.*;
 @PropertySource("classpath:application.properties")
 @ComponentScan(basePackages = "com.griddynamics.gridu.pbazhko")
 public class AppConfig {
-
-    public static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
-    public static final String AUTO_REGISTER_SCHEMAS_CONFIG = "auto.register.schemas";
 
     @Bean
     public KafkaProducerHolder<String, GitHubAccount> kafkaProducerHolder(Environment env) {

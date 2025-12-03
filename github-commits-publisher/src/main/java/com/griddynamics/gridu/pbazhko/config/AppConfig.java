@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import static com.griddynamics.gridu.pbazhko.constants.Constants.*;
+
 @Slf4j
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -42,10 +44,6 @@ import java.util.Properties;
 public class AppConfig {
 
     private final Environment env;
-
-    private static final String SCHEMA_REGISTRY_URL_CONFIG = "schema.registry.url";
-    private static final String AUTO_REGISTER_SCHEMAS_CONFIG = "auto.register.schemas";
-    private static final String JSON_VALUE_TYPE_CONFIG = "json.value.type";
 
     @Bean
     public TimeProvider timeProvider() {
