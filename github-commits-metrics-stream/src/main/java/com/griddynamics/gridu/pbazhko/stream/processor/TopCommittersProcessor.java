@@ -17,12 +17,12 @@ import java.util.Comparator;
 @RequiredArgsConstructor
 public class TopCommittersProcessor implements Processor<String, Long, String, CommitersMetricModel> {
 
-    private KeyValueStore<String, Long> topCommittersStore;
-    private ProcessorContext<String, CommitersMetricModel> context;
-
     private final String topCommittersStateStoreName;
     private final int topCommittersGroupSize;
     private final String topCommittersKey;
+
+    private KeyValueStore<String, Long> topCommittersStore;
+    private ProcessorContext<String, CommitersMetricModel> context;
 
     @Override
     public void init(ProcessorContext<String, CommitersMetricModel> context) {

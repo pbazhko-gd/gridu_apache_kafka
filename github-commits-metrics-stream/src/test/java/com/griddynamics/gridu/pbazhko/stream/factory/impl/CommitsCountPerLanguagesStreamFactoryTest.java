@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = CommitsCountPerLanguagesStreamFactory.class)
-class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<LanguagesMetricModel> {
+class CommitsCountPerLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<LanguagesMetricModel> {
 
     @Autowired
     private CommitsCountPerLanguagesStreamFactory streamFactory;
@@ -26,14 +26,11 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Lan
     @Autowired
     private KafkaJsonSchemaSerde<LanguagesMetricModel> languagesMetricModelKafkaJsonSchemaSerde;
 
-    @Value("${TOP_LANGUAGES_TOPIC}")
-    private String topLanguagesTopic;
+    @Value("${COMMITS_COUNT_PER_LANGUAGE_TOPIC}")
+    private String commitsCountPerLanguageTopic;
 
-    @Value("${TOP_LANGUAGES_GROUP_SIZE}")
-    private int topLanguagesGroupSize;
-
-    @Value("${TOP_LANGUAGES_KEY}")
-    private String topLanguagesKey;
+    @Value("${COMMITS_COUNT_PER_LANGUAGE_KEY}")
+    private String commitsCountPerLanguageKey;
 
     @Override
     protected GitHubCommitsMetricsStreamFactory getStreamFactory() {
@@ -43,7 +40,7 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Lan
     @Override
     protected TestOutputTopic<String, LanguagesMetricModel> getOutputTopic() {
         return testDriver.createOutputTopic(
-            topLanguagesTopic,
+            commitsCountPerLanguageTopic,
             stringSerde.deserializer(),
             languagesMetricModelKafkaJsonSchemaSerde.deserializer()
         );
@@ -63,23 +60,41 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Lan
         KeyValue<String, LanguagesMetricModel> kv;
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topLanguagesKey, kv.key);
+        assertEquals(commitsCountPerLanguageKey, kv.key);
         assertEquals(LanguagesMetricModel.of(
             new LanguageMetricRecord("java", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topLanguagesKey, kv.key);
+        assertEquals(commitsCountPerLanguageKey, kv.key);
         assertEquals(LanguagesMetricModel.of(
             new LanguageMetricRecord("java", 1L),
             new LanguageMetricRecord("kotlin", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topLanguagesKey, kv.key);
+        assertEquals(commitsCountPerLanguageKey, kv.key);
         assertEquals(LanguagesMetricModel.of(
+            new LanguageMetricRecord("java", 1L),
+            new LanguageMetricRecord("kotlin", 1L),
+            new LanguageMetricRecord("python", 1L)
+        ), kv.value);
+
+        kv = outputTopic.readKeyValue();
+        assertEquals(commitsCountPerLanguageKey, kv.key);
+        assertEquals(LanguagesMetricModel.of(
+            new LanguageMetricRecord("java", 1L),
             new LanguageMetricRecord("kotlin", 2L),
-            new LanguageMetricRecord("java", 1L)
+            new LanguageMetricRecord("python", 1L)
+        ), kv.value);
+
+        kv = outputTopic.readKeyValue();
+        assertEquals(commitsCountPerLanguageKey, kv.key);
+        assertEquals(LanguagesMetricModel.of(
+            new LanguageMetricRecord("java", 1L),
+            new LanguageMetricRecord("kotlin", 2L),
+            new LanguageMetricRecord("python", 1L),
+            new LanguageMetricRecord("scala", 1L)
         ), kv.value);
 
         assertTrue(outputTopic.isEmpty());

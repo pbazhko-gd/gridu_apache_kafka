@@ -12,10 +12,10 @@ import org.apache.kafka.streams.state.KeyValueStore;
 @RequiredArgsConstructor
 public class CommitsDeduplicationProcessor implements Processor<String, GitHubCommit, String, GitHubCommit> {
 
+    private final String uniqueShaStateStore;
+
     private KeyValueStore<String, Boolean> store;
     private ProcessorContext<String, GitHubCommit> context;
-
-    private final String uniqueShaStateStore;
 
     @Override
     public void init(ProcessorContext<String, GitHubCommit> context) {

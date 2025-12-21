@@ -2,6 +2,7 @@ package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
 import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
 import com.griddynamics.gridu.pbazhko.stream.factory.AbstractGitHubCommitsMetricsStreamFactory;
+import com.griddynamics.gridu.pbazhko.stream.processor.CommitsPerLanguageProcessor;
 import com.griddynamics.gridu.pbazhko.stream.processor.TopLanguagesProcessor;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TopLanguagesStreamFactory extends AbstractGitHubCommitsMetricsStreamFactory {
+public class CommitsCountPerLanguagesStreamFactory extends AbstractGitHubCommitsMetricsStreamFactory {
+
+    @Value("${COMMITS_COUNT_PER_LANGUAGE_TOPIC}")
+    private String commitsCountPerLanguageTopic;
 
     @Value("${TOP_LANGUAGES_TOPIC}")
     private String topLanguagesTopic;
@@ -28,24 +32,27 @@ public class TopLanguagesStreamFactory extends AbstractGitHubCommitsMetricsStrea
     @Value("${TOP_LANGUAGES_GROUP_SIZE}")
     private int topLanguagesGroupSize;
 
+    @Value("${COMMITS_COUNT_PER_LANGUAGE_STATE_STORE}")
+    private String commitsCountPerLanguageStateStoreName;
+
     @Value("${TOP_LANGUAGES_CURRENT_TOP_STATE_STORE}")
     private String topLanguagesCurrentTopStateStoreName;
 
-    @Value("${TOP_LANGUAGES_COMMITS_PER_LANGUAGE_STATE_STORE}")
-    private String commitsPerLanguageStateStoreName;
+    @Value("${COMMITS_COUNT_PER_LANGUAGE_KEY}")
+    private String commitsCountPerLanguageKey;
 
     @Value("${TOP_LANGUAGES_KEY}")
     private String topLanguagesKey;
 
-    @Value("${TOP_LANGUAGES_STREAMS_APPLICATION_ID}")
-    private String topLanguagesStreamApplicationId;
+    @Value("${COMMITS_COUNT_PER_LANGUAGE_STREAMS_APPLICATION_ID}")
+    private String commitsCountPerLanguageStreamsApplicationId;
 
     @Autowired
     private KafkaJsonSchemaSerde<LanguagesMetricModel> languagesMetricModelKafkaJsonSchemaSerde;
 
     @Override
     public String getApplicationId() {
-        return topLanguagesStreamApplicationId;
+        return commitsCountPerLanguageStreamsApplicationId;
     }
 
     @Override
@@ -58,8 +65,21 @@ public class TopLanguagesStreamFactory extends AbstractGitHubCommitsMetricsStrea
             .selectKey((key, value) -> value.getLanguage())
             .map((key, value) -> KeyValue.pair(key, 1L))
             .groupByKey(Grouped.with(stringSerde, longSerde))
-            .count(Materialized.as(commitsPerLanguageStateStoreName));
+            .count(Materialized.as(commitsCountPerLanguageStateStoreName));
 
+        // Recalculate commits per language metrics
+        var commitsPerLanguageKStream = commitsPerLanguageKTable.toStream()
+            .process(
+                () -> new CommitsPerLanguageProcessor(commitsCountPerLanguageStateStoreName, commitsCountPerLanguageKey),
+                commitsCountPerLanguageStateStoreName
+            );
+
+        commitsPerLanguageKStream.to(
+            commitsCountPerLanguageTopic,
+            Produced.with(stringSerde, languagesMetricModelKafkaJsonSchemaSerde)
+        );
+
+        // Recalculate TOP languages metrics
         streamsBuilder.addStateStore(
             Stores.keyValueStoreBuilder(
                 Stores.persistentKeyValueStore(topLanguagesCurrentTopStateStoreName),

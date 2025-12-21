@@ -17,17 +17,17 @@ import java.util.Comparator;
 @RequiredArgsConstructor
 public class TopLanguagesProcessor implements Processor<String, Long, String, LanguagesMetricModel> {
 
-    private KeyValueStore<String, Long> topLanguagesStore;
-    private ProcessorContext<String, LanguagesMetricModel> context;
-
     private final String topLanguagesStateStoreName;
     private final int topLanguagesGroupSize;
     private final String topLanguagesKey;
 
+    private KeyValueStore<String, Long> topLanguagesStateStore;
+    private ProcessorContext<String, LanguagesMetricModel> context;
+
     @Override
     public void init(ProcessorContext<String, LanguagesMetricModel> context) {
         this.context = context;
-        this.topLanguagesStore = context.getStateStore(topLanguagesStateStoreName);
+        this.topLanguagesStateStore = context.getStateStore(topLanguagesStateStoreName);
     }
 
     @Override
@@ -39,17 +39,17 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, La
         }
 
         boolean isRatingUpdated = false;
-        var previousResultInTop = topLanguagesStore.get(language);
+        var previousResultInTop = topLanguagesStateStore.get(language);
 
         if (previousResultInTop != null) {
             // rewrite the existing language in top with the new value
             log.debug("Update '{}' in top-{} with {} commit(s)", language, topLanguagesGroupSize, commitsCount);
-            topLanguagesStore.put(language, commitsCount);
+            topLanguagesStateStore.put(language, commitsCount);
             isRatingUpdated = true;
         } else if (getCurrentTopLanguagesCount() < topLanguagesGroupSize) {
             // put a new language into top if it's size is less than the configured limit
             log.debug("Put '{}' into top-{} with {} commit(s)", language, topLanguagesGroupSize, commitsCount);
-            topLanguagesStore.put(language, commitsCount);
+            topLanguagesStateStore.put(language, commitsCount);
             isRatingUpdated = true;
         } else {
             var currentLanguageInTopWithMinResult = getCurrentTopLanguageWithMinCount();
@@ -57,8 +57,8 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, La
             if (currentLanguageInTopWithMinResult != null && commitsCount > currentLanguageInTopWithMinResult.value) {
                 log.debug("Replace '{}' in top-{} to '{}' {} commit(s)",
                     currentLanguageInTopWithMinResult.key, language, topLanguagesGroupSize, commitsCount);
-                topLanguagesStore.delete(currentLanguageInTopWithMinResult.key);
-                topLanguagesStore.put(language, commitsCount);
+                topLanguagesStateStore.delete(currentLanguageInTopWithMinResult.key);
+                topLanguagesStateStore.put(language, commitsCount);
                 isRatingUpdated = true;
             }
         }
@@ -70,7 +70,7 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, La
 
     private int getCurrentTopLanguagesCount() {
         int size = 0;
-        try (KeyValueIterator<String, Long> it = topLanguagesStore.all()) {
+        try (KeyValueIterator<String, Long> it = topLanguagesStateStore.all()) {
             while (it.hasNext()) {
                 it.next();
                 size++;
@@ -81,7 +81,7 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, La
 
     private KeyValue<String, Long> getCurrentTopLanguageWithMinCount() {
         KeyValue<String, Long> min = null;
-        try (KeyValueIterator<String, Long> it = topLanguagesStore.all()) {
+        try (KeyValueIterator<String, Long> it = topLanguagesStateStore.all()) {
             while (it.hasNext()) {
                 KeyValue<String, Long> kv = it.next();
                 if (min == null || kv.value < min.value) {
@@ -95,7 +95,7 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, La
     private LanguagesMetricModel buildTopCommittersModel() {
         var languages = new ArrayList<LanguagesMetricModel.LanguageMetricRecord>();
 
-        try (KeyValueIterator<String, Long> it = topLanguagesStore.all()) {
+        try (KeyValueIterator<String, Long> it = topLanguagesStateStore.all()) {
             while (it.hasNext()) {
                 var kv = it.next();
                 languages.add(
