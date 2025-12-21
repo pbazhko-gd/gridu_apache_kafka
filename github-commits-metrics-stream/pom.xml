@@ -43,5 +43,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>com.griddynamics.gridu.pbazhko</groupId>
+            <artifactId>common-tests</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

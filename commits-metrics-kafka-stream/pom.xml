@@ -28,13 +28,6 @@
             <artifactId>github-accounts-analyzer</artifactId>
             <version>1.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams-test-utils</artifactId>
-            <version>2.4.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
