@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.TopLanguagesModel;
-import com.griddynamics.gridu.pbazhko.model.TopLanguagesModel.LanguageModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesModel.LanguageData;
 import com.griddynamics.gridu.pbazhko.stream.BaseGitHubCommitsMetricsTopology;
 import com.griddynamics.gridu.pbazhko.stream.factory.GitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = TopLanguagesStreamFactory.class)
-class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<TopLanguagesModel> {
+class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<LanguagesModel> {
 
     @Autowired
     private TopLanguagesStreamFactory streamFactory;
 
     @Autowired
-    private KafkaJsonSchemaSerde<TopLanguagesModel> topLanguagesKafkaJsonSchemaSerde;
+    private KafkaJsonSchemaSerde<LanguagesModel> topLanguagesKafkaJsonSchemaSerde;
 
     @Value("${TOP_LANGUAGES_TOPIC}")
     private String topLanguagesTopic;
@@ -41,7 +41,7 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Top
     }
 
     @Override
-    protected TestOutputTopic<String, TopLanguagesModel> getOutputTopic() {
+    protected TestOutputTopic<String, LanguagesModel> getOutputTopic() {
         return testDriver.createOutputTopic(
             topLanguagesTopic,
             stringSerde.deserializer(),
@@ -60,26 +60,26 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Top
             ShortCommit.of("user3", "kotlin", "sha4") // duplicate sha
         ));
 
-        KeyValue<String, TopLanguagesModel> kv;
+        KeyValue<String, LanguagesModel> kv;
 
         kv = outputTopic.readKeyValue();
         assertEquals(topLanguagesKey, kv.key);
-        assertEquals(TopLanguagesModel.of(
-            new LanguageModel("java", 1L)
+        assertEquals(LanguagesModel.of(
+            new LanguageData("java", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topLanguagesKey, kv.key);
-        assertEquals(TopLanguagesModel.of(
-            new LanguageModel("java", 1L),
-            new LanguageModel("kotlin", 1L)
+        assertEquals(LanguagesModel.of(
+            new LanguageData("java", 1L),
+            new LanguageData("kotlin", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topLanguagesKey, kv.key);
-        assertEquals(TopLanguagesModel.of(
-            new LanguageModel("kotlin", 2L),
-            new LanguageModel("java", 1L)
+        assertEquals(LanguagesModel.of(
+            new LanguageData("kotlin", 2L),
+            new LanguageData("java", 1L)
         ), kv.value);
 
         assertTrue(outputTopic.isEmpty());

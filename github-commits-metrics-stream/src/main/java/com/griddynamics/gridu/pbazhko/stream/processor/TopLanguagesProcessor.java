@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.processor;
 
-import com.griddynamics.gridu.pbazhko.model.TopLanguagesModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
@@ -15,17 +15,17 @@ import java.util.Comparator;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TopLanguagesProcessor implements Processor<String, Long, String, TopLanguagesModel> {
+public class TopLanguagesProcessor implements Processor<String, Long, String, LanguagesModel> {
 
     private KeyValueStore<String, Long> topLanguagesStore;
-    private ProcessorContext<String, TopLanguagesModel> context;
+    private ProcessorContext<String, LanguagesModel> context;
 
     private final String topLanguagesStateStoreName;
     private final int topLanguagesGroupSize;
     private final String topLanguagesKey;
 
     @Override
-    public void init(ProcessorContext<String, TopLanguagesModel> context) {
+    public void init(ProcessorContext<String, LanguagesModel> context) {
         this.context = context;
         this.topLanguagesStore = context.getStateStore(topLanguagesStateStoreName);
     }
@@ -92,24 +92,24 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, To
         return min;
     }
 
-    private TopLanguagesModel buildTopCommittersModel() {
-        var languages = new ArrayList<TopLanguagesModel.LanguageModel>();
+    private LanguagesModel buildTopCommittersModel() {
+        var languages = new ArrayList<LanguagesModel.LanguageData>();
 
         try (KeyValueIterator<String, Long> it = topLanguagesStore.all()) {
             while (it.hasNext()) {
                 var kv = it.next();
                 languages.add(
-                    new TopLanguagesModel.LanguageModel(kv.key, kv.value)
+                    new LanguagesModel.LanguageData(kv.key, kv.value)
                 );
             }
         }
 
         languages.sort(
             Comparator
-                .comparingLong(TopLanguagesModel.LanguageModel::getCommitsCount)
+                .comparingLong(LanguagesModel.LanguageData::getCommitsCount)
                 .reversed()
         );
 
-        return new TopLanguagesModel(languages);
+        return new LanguagesModel(languages);
     }
 }

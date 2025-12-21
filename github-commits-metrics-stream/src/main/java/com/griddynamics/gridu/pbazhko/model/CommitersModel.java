@@ -10,19 +10,19 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TopCommitersModel {
+public class CommitersModel {
 
-    private List<CommitterModel> committers;
+    private List<CommitterData> committers;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CommitterModel {
+    public static class CommitterData {
         private String author;
         private Long commitsCount;
     }
 
-    public static TopCommitersModel of(CommitterModel... committers) {
-        return new TopCommitersModel(Arrays.asList(committers));
+    public static CommitersModel of(CommitterData... committers) {
+        return new CommitersModel(Arrays.asList(committers));
     }
 }

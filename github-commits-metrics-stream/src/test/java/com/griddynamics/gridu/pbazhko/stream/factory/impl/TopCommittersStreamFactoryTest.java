@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.TopCommitersModel;
-import com.griddynamics.gridu.pbazhko.model.TopCommitersModel.CommitterModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersModel.CommitterData;
 import com.griddynamics.gridu.pbazhko.stream.BaseGitHubCommitsMetricsTopology;
 import com.griddynamics.gridu.pbazhko.stream.factory.GitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = TopCommittersStreamFactory.class)
-class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<TopCommitersModel> {
+class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<CommitersModel> {
 
     @Autowired
     private TopCommittersStreamFactory streamFactory;
 
     @Autowired
-    private KafkaJsonSchemaSerde<TopCommitersModel> topCommittersKafkaJsonSchemaSerde;
+    private KafkaJsonSchemaSerde<CommitersModel> topCommittersKafkaJsonSchemaSerde;
 
     @Value("${TOP_COMMITTERS_TOPIC}")
     private String topCommittersTopic;
@@ -41,7 +41,7 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<To
     }
 
     @Override
-    protected TestOutputTopic<String, TopCommitersModel> getOutputTopic() {
+    protected TestOutputTopic<String, CommitersModel> getOutputTopic() {
         return testDriver.createOutputTopic(
             topCommittersTopic,
             stringSerde.deserializer(),
@@ -60,33 +60,33 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<To
             ShortCommit.of("user3", "kotlin", "sha4") // duplicate sha
         ));
 
-        KeyValue<String, TopCommitersModel> kv;
+        KeyValue<String, CommitersModel> kv;
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(TopCommitersModel.of(
-            new CommitterModel("user1", 1L)
+        assertEquals(CommitersModel.of(
+            new CommitterData("user1", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(TopCommitersModel.of(
-            new CommitterModel("user1", 1L),
-            new CommitterModel("user2", 1L)
+        assertEquals(CommitersModel.of(
+            new CommitterData("user1", 1L),
+            new CommitterData("user2", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(TopCommitersModel.of(
-            new CommitterModel("user1", 2L),
-            new CommitterModel("user2", 1L)
+        assertEquals(CommitersModel.of(
+            new CommitterData("user1", 2L),
+            new CommitterData("user2", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(TopCommitersModel.of(
-            new CommitterModel("user1", 2L),
-            new CommitterModel("user2", 2L)
+        assertEquals(CommitersModel.of(
+            new CommitterData("user1", 2L),
+            new CommitterData("user2", 2L)
         ), kv.value);
 
         assertTrue(outputTopic.isEmpty());

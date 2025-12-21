@@ -10,19 +10,19 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TopLanguagesModel {
+public class LanguagesModel {
 
-    private List<LanguageModel> committers;
+    private List<LanguageData> languages;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LanguageModel {
+    public static class LanguageData {
         private String language;
         private Long commitsCount;
     }
 
-    public static TopLanguagesModel of(LanguageModel... languages) {
-        return new TopLanguagesModel(Arrays.asList(languages));
+    public static LanguagesModel of(LanguageData... languages) {
+        return new LanguagesModel(Arrays.asList(languages));
     }
 }
