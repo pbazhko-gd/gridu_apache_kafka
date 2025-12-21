@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
-import com.griddynamics.gridu.pbazhko.model.LanguagesModel.LanguageData;
+import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel.LanguageMetricRecord;
 import com.griddynamics.gridu.pbazhko.stream.BaseGitHubCommitsMetricsTopology;
 import com.griddynamics.gridu.pbazhko.stream.factory.GitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = TopLanguagesStreamFactory.class)
-class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<LanguagesModel> {
+class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<LanguagesMetricModel> {
 
     @Autowired
     private TopLanguagesStreamFactory streamFactory;
 
     @Autowired
-    private KafkaJsonSchemaSerde<LanguagesModel> topLanguagesKafkaJsonSchemaSerde;
+    private KafkaJsonSchemaSerde<LanguagesMetricModel> languagesMetricModelKafkaJsonSchemaSerde;
 
     @Value("${TOP_LANGUAGES_TOPIC}")
     private String topLanguagesTopic;
@@ -41,11 +41,11 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Lan
     }
 
     @Override
-    protected TestOutputTopic<String, LanguagesModel> getOutputTopic() {
+    protected TestOutputTopic<String, LanguagesMetricModel> getOutputTopic() {
         return testDriver.createOutputTopic(
             topLanguagesTopic,
             stringSerde.deserializer(),
-            topLanguagesKafkaJsonSchemaSerde.deserializer()
+            languagesMetricModelKafkaJsonSchemaSerde.deserializer()
         );
     }
 
@@ -60,26 +60,26 @@ class TopLanguagesStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Lan
             ShortCommit.of("user3", "kotlin", "sha4") // duplicate sha
         ));
 
-        KeyValue<String, LanguagesModel> kv;
+        KeyValue<String, LanguagesMetricModel> kv;
 
         kv = outputTopic.readKeyValue();
         assertEquals(topLanguagesKey, kv.key);
-        assertEquals(LanguagesModel.of(
-            new LanguageData("java", 1L)
+        assertEquals(LanguagesMetricModel.of(
+            new LanguageMetricRecord("java", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topLanguagesKey, kv.key);
-        assertEquals(LanguagesModel.of(
-            new LanguageData("java", 1L),
-            new LanguageData("kotlin", 1L)
+        assertEquals(LanguagesMetricModel.of(
+            new LanguageMetricRecord("java", 1L),
+            new LanguageMetricRecord("kotlin", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topLanguagesKey, kv.key);
-        assertEquals(LanguagesModel.of(
-            new LanguageData("kotlin", 2L),
-            new LanguageData("java", 1L)
+        assertEquals(LanguagesMetricModel.of(
+            new LanguageMetricRecord("kotlin", 2L),
+            new LanguageMetricRecord("java", 1L)
         ), kv.value);
 
         assertTrue(outputTopic.isEmpty());

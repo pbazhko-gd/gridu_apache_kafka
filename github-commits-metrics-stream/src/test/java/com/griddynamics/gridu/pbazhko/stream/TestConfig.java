@@ -1,8 +1,8 @@
 package com.griddynamics.gridu.pbazhko.stream;
 
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
-import com.griddynamics.gridu.pbazhko.model.CommitersModel;
-import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
 import org.springframework.context.annotation.Bean;
@@ -25,14 +25,14 @@ public class TestConfig {
 
     @Bean
     @Primary
-    public KafkaJsonSchemaSerde<CommitersModel> topCommittersKafkaJsonSchemaSerde() {
-        return buildCustomJsonSchemaSerde(CommitersModel.class);
+    public KafkaJsonSchemaSerde<CommitersMetricModel> committersMetricModelKafkaJsonSchemaSerde() {
+        return buildCustomJsonSchemaSerde(CommitersMetricModel.class);
     }
 
     @Bean
     @Primary
-    public KafkaJsonSchemaSerde<LanguagesModel> topLanguagesKafkaJsonSchemaSerde() {
-        return buildCustomJsonSchemaSerde(LanguagesModel.class);
+    public KafkaJsonSchemaSerde<LanguagesMetricModel> languagesMetricModelKafkaJsonSchemaSerde() {
+        return buildCustomJsonSchemaSerde(LanguagesMetricModel.class);
     }
 
     private <T> KafkaJsonSchemaSerde<T> buildCustomJsonSchemaSerde(Class<T> clazz) {

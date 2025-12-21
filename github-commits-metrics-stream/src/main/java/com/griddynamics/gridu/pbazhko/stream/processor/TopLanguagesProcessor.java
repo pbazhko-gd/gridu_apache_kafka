@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.processor;
 
-import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
@@ -15,17 +15,17 @@ import java.util.Comparator;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TopLanguagesProcessor implements Processor<String, Long, String, LanguagesModel> {
+public class TopLanguagesProcessor implements Processor<String, Long, String, LanguagesMetricModel> {
 
     private KeyValueStore<String, Long> topLanguagesStore;
-    private ProcessorContext<String, LanguagesModel> context;
+    private ProcessorContext<String, LanguagesMetricModel> context;
 
     private final String topLanguagesStateStoreName;
     private final int topLanguagesGroupSize;
     private final String topLanguagesKey;
 
     @Override
-    public void init(ProcessorContext<String, LanguagesModel> context) {
+    public void init(ProcessorContext<String, LanguagesMetricModel> context) {
         this.context = context;
         this.topLanguagesStore = context.getStateStore(topLanguagesStateStoreName);
     }
@@ -92,24 +92,24 @@ public class TopLanguagesProcessor implements Processor<String, Long, String, La
         return min;
     }
 
-    private LanguagesModel buildTopCommittersModel() {
-        var languages = new ArrayList<LanguagesModel.LanguageData>();
+    private LanguagesMetricModel buildTopCommittersModel() {
+        var languages = new ArrayList<LanguagesMetricModel.LanguageMetricRecord>();
 
         try (KeyValueIterator<String, Long> it = topLanguagesStore.all()) {
             while (it.hasNext()) {
                 var kv = it.next();
                 languages.add(
-                    new LanguagesModel.LanguageData(kv.key, kv.value)
+                    new LanguagesMetricModel.LanguageMetricRecord(kv.key, kv.value)
                 );
             }
         }
 
         languages.sort(
             Comparator
-                .comparingLong(LanguagesModel.LanguageData::getCommitsCount)
+                .comparingLong(LanguagesMetricModel.LanguageMetricRecord::getCommitsCount)
                 .reversed()
         );
 
-        return new LanguagesModel(languages);
+        return new LanguagesMetricModel(languages);
     }
 }

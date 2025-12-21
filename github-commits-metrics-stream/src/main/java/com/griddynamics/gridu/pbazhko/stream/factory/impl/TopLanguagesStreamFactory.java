@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
 import com.griddynamics.gridu.pbazhko.stream.factory.AbstractGitHubCommitsMetricsStreamFactory;
 import com.griddynamics.gridu.pbazhko.stream.processor.TopLanguagesProcessor;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
@@ -41,7 +41,7 @@ public class TopLanguagesStreamFactory extends AbstractGitHubCommitsMetricsStrea
     private String topLanguagesStreamApplicationId;
 
     @Autowired
-    private KafkaJsonSchemaSerde<LanguagesModel> topLanguagesKafkaJsonSchemaSerde;
+    private KafkaJsonSchemaSerde<LanguagesMetricModel> languagesMetricModelKafkaJsonSchemaSerde;
 
     @Override
     public String getApplicationId() {
@@ -80,7 +80,7 @@ public class TopLanguagesStreamFactory extends AbstractGitHubCommitsMetricsStrea
 
         topLanguagesKStream.to(
             topLanguagesTopic,
-            Produced.with(stringSerde, topLanguagesKafkaJsonSchemaSerde)
+            Produced.with(stringSerde, languagesMetricModelKafkaJsonSchemaSerde)
         );
 
         return streamsBuilder.build();

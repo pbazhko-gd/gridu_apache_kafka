@@ -2,8 +2,8 @@ package com.griddynamics.gridu.pbazhko.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
-import com.griddynamics.gridu.pbazhko.model.CommitersModel;
-import com.griddynamics.gridu.pbazhko.model.LanguagesModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,13 +46,13 @@ public class AppConfig {
     }
 
     @Bean
-    public KafkaJsonSchemaSerde<CommitersModel> topCommittersKafkaJsonSchemaSerde() {
-        return buildCustomSerde(CommitersModel.class);
+    public KafkaJsonSchemaSerde<CommitersMetricModel> committersMetricModelKafkaJsonSchemaSerde() {
+        return buildCustomSerde(CommitersMetricModel.class);
     }
 
     @Bean
-    public KafkaJsonSchemaSerde<LanguagesModel> topLanguagesKafkaJsonSchemaSerde() {
-        return buildCustomSerde(LanguagesModel.class);
+    public KafkaJsonSchemaSerde<LanguagesMetricModel> languagesMetricModelKafkaJsonSchemaSerde() {
+        return buildCustomSerde(LanguagesMetricModel.class);
     }
 
     @Bean("baseKafkaStreamProperties")

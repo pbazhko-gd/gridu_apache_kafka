@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.CommitersModel;
-import com.griddynamics.gridu.pbazhko.model.CommitersModel.CommitterData;
+import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel.CommitterMetricRecord;
 import com.griddynamics.gridu.pbazhko.stream.BaseGitHubCommitsMetricsTopology;
 import com.griddynamics.gridu.pbazhko.stream.factory.GitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = TopCommittersStreamFactory.class)
-class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<CommitersModel> {
+class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<CommitersMetricModel> {
 
     @Autowired
     private TopCommittersStreamFactory streamFactory;
 
     @Autowired
-    private KafkaJsonSchemaSerde<CommitersModel> topCommittersKafkaJsonSchemaSerde;
+    private KafkaJsonSchemaSerde<CommitersMetricModel> committersMetricModelKafkaJsonSchemaSerde;
 
     @Value("${TOP_COMMITTERS_TOPIC}")
     private String topCommittersTopic;
@@ -41,11 +41,11 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Co
     }
 
     @Override
-    protected TestOutputTopic<String, CommitersModel> getOutputTopic() {
+    protected TestOutputTopic<String, CommitersMetricModel> getOutputTopic() {
         return testDriver.createOutputTopic(
             topCommittersTopic,
             stringSerde.deserializer(),
-            topCommittersKafkaJsonSchemaSerde.deserializer()
+            committersMetricModelKafkaJsonSchemaSerde.deserializer()
         );
     }
 
@@ -60,33 +60,33 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Co
             ShortCommit.of("user3", "kotlin", "sha4") // duplicate sha
         ));
 
-        KeyValue<String, CommitersModel> kv;
+        KeyValue<String, CommitersMetricModel> kv;
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(CommitersModel.of(
-            new CommitterData("user1", 1L)
+        assertEquals(CommitersMetricModel.of(
+            new CommitterMetricRecord("user1", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(CommitersModel.of(
-            new CommitterData("user1", 1L),
-            new CommitterData("user2", 1L)
+        assertEquals(CommitersMetricModel.of(
+            new CommitterMetricRecord("user1", 1L),
+            new CommitterMetricRecord("user2", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(CommitersModel.of(
-            new CommitterData("user1", 2L),
-            new CommitterData("user2", 1L)
+        assertEquals(CommitersMetricModel.of(
+            new CommitterMetricRecord("user1", 2L),
+            new CommitterMetricRecord("user2", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
         assertEquals(topCommittersKey, kv.key);
-        assertEquals(CommitersModel.of(
-            new CommitterData("user1", 2L),
-            new CommitterData("user2", 2L)
+        assertEquals(CommitersMetricModel.of(
+            new CommitterMetricRecord("user1", 2L),
+            new CommitterMetricRecord("user2", 2L)
         ), kv.value);
 
         assertTrue(outputTopic.isEmpty());

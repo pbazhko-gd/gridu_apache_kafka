@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.CommitersModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
 import com.griddynamics.gridu.pbazhko.stream.processor.TopCommittersProcessor;
 import com.griddynamics.gridu.pbazhko.stream.factory.AbstractGitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
@@ -41,7 +41,7 @@ public class TopCommittersStreamFactory extends AbstractGitHubCommitsMetricsStre
     private String topCommittersStreamApplicationId;
 
     @Autowired
-    private KafkaJsonSchemaSerde<CommitersModel> topCommittersKafkaJsonSchemaSerde;
+    private KafkaJsonSchemaSerde<CommitersMetricModel> committersMetricModelKafkaJsonSchemaSerde;
 
     @Override
     public String getApplicationId() {
@@ -80,7 +80,7 @@ public class TopCommittersStreamFactory extends AbstractGitHubCommitsMetricsStre
 
         topCommittersKStream.to(
             topCommittersTopic,
-            Produced.with(stringSerde, topCommittersKafkaJsonSchemaSerde)
+            Produced.with(stringSerde, committersMetricModelKafkaJsonSchemaSerde)
         );
 
         return streamsBuilder.build();

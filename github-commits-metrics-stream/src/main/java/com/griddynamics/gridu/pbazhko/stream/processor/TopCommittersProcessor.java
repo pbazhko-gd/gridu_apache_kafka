@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.processor;
 
-import com.griddynamics.gridu.pbazhko.model.CommitersModel;
+import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
@@ -15,17 +15,17 @@ import java.util.Comparator;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TopCommittersProcessor implements Processor<String, Long, String, CommitersModel> {
+public class TopCommittersProcessor implements Processor<String, Long, String, CommitersMetricModel> {
 
     private KeyValueStore<String, Long> topCommittersStore;
-    private ProcessorContext<String, CommitersModel> context;
+    private ProcessorContext<String, CommitersMetricModel> context;
 
     private final String topCommittersStateStoreName;
     private final int topCommittersGroupSize;
     private final String topCommittersKey;
 
     @Override
-    public void init(ProcessorContext<String, CommitersModel> context) {
+    public void init(ProcessorContext<String, CommitersMetricModel> context) {
         this.context = context;
         this.topCommittersStore = context.getStateStore(topCommittersStateStoreName);
     }
@@ -92,24 +92,24 @@ public class TopCommittersProcessor implements Processor<String, Long, String, C
         return min;
     }
 
-    private CommitersModel buildTopCommittersModel() {
-        var committers = new ArrayList<CommitersModel.CommitterData>();
+    private CommitersMetricModel buildTopCommittersModel() {
+        var committers = new ArrayList<CommitersMetricModel.CommitterMetricRecord>();
 
         try (KeyValueIterator<String, Long> it = topCommittersStore.all()) {
             while (it.hasNext()) {
                 var kv = it.next();
                 committers.add(
-                    new CommitersModel.CommitterData(kv.key, kv.value)
+                    new CommitersMetricModel.CommitterMetricRecord(kv.key, kv.value)
                 );
             }
         }
 
         committers.sort(
             Comparator
-                .comparingLong(CommitersModel.CommitterData::getCommitsCount)
+                .comparingLong(CommitersMetricModel.CommitterMetricRecord::getCommitsCount)
                 .reversed()
         );
 
-        return new CommitersModel(committers);
+        return new CommitersMetricModel(committers);
     }
 }
