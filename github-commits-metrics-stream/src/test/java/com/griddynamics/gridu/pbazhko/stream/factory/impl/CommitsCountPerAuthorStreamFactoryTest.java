@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ContextConfiguration(classes = CommitsCountPerAuthorStreamFactory.class)
-class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<CommitersMetricModel> {
+class CommitsCountPerAuthorStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<CommitersMetricModel> {
 
     @Autowired
     private CommitsCountPerAuthorStreamFactory streamFactory;
@@ -26,14 +26,11 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Co
     @Autowired
     private KafkaJsonSchemaSerde<CommitersMetricModel> committersMetricModelKafkaJsonSchemaSerde;
 
-    @Value("${TOP_COMMITTERS_TOPIC}")
-    private String topCommittersTopic;
+    @Value("${COMMITS_COUNT_PER_AUTHOR_TOPIC}")
+    private String commitsCountPerAuthorTopic;
 
-    @Value("${TOP_COMMITTERS_GROUP_SIZE}")
-    private int topCommittersGroupSize;
-
-    @Value("${TOP_COMMITTERS_KEY}")
-    private String topCommittersKey;
+    @Value("${COMMITS_COUNT_PER_AUTHOR_KEY}")
+    private String commitsCountPerAuthorKey;
 
     @Override
     protected GitHubCommitsMetricsStreamFactory getStreamFactory() {
@@ -43,7 +40,7 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Co
     @Override
     protected TestOutputTopic<String, CommitersMetricModel> getOutputTopic() {
         return testDriver.createOutputTopic(
-            topCommittersTopic,
+            commitsCountPerAuthorTopic,
             stringSerde.deserializer(),
             committersMetricModelKafkaJsonSchemaSerde.deserializer()
         );
@@ -63,30 +60,39 @@ class TopCommittersStreamFactoryTest extends BaseGitHubCommitsMetricsTopology<Co
         KeyValue<String, CommitersMetricModel> kv;
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topCommittersKey, kv.key);
+        assertEquals(commitsCountPerAuthorKey, kv.key);
         assertEquals(CommitersMetricModel.of(
             new CommitterMetricRecord("user1", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topCommittersKey, kv.key);
+        assertEquals(commitsCountPerAuthorKey, kv.key);
         assertEquals(CommitersMetricModel.of(
             new CommitterMetricRecord("user1", 1L),
             new CommitterMetricRecord("user2", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topCommittersKey, kv.key);
+        assertEquals(commitsCountPerAuthorKey, kv.key);
         assertEquals(CommitersMetricModel.of(
             new CommitterMetricRecord("user1", 2L),
             new CommitterMetricRecord("user2", 1L)
         ), kv.value);
 
         kv = outputTopic.readKeyValue();
-        assertEquals(topCommittersKey, kv.key);
+        assertEquals(commitsCountPerAuthorKey, kv.key);
         assertEquals(CommitersMetricModel.of(
             new CommitterMetricRecord("user1", 2L),
-            new CommitterMetricRecord("user2", 2L)
+            new CommitterMetricRecord("user2", 1L),
+            new CommitterMetricRecord("user3", 1L)
+        ), kv.value);
+
+        kv = outputTopic.readKeyValue();
+        assertEquals(commitsCountPerAuthorKey, kv.key);
+        assertEquals(CommitersMetricModel.of(
+            new CommitterMetricRecord("user1", 2L),
+            new CommitterMetricRecord("user2", 2L),
+            new CommitterMetricRecord("user3", 1L)
         ), kv.value);
 
         assertTrue(outputTopic.isEmpty());

@@ -29,12 +29,12 @@ public class CommitsPerLanguageProcessor implements Processor<String, Long, Stri
 
     @Override
     public void process(Record<String, Long> record) {
-        var model = buildTopCommittersModel();
+        var model = buildLanguagesMetricModel();
         log.debug("Update commits per language metrics with value '{}'", model);
         context.forward(new Record<>(commitsCountPerLanguageKey, model, record.timestamp()));
     }
 
-    private LanguagesMetricModel buildTopCommittersModel() {
+    private LanguagesMetricModel buildLanguagesMetricModel() {
         var languages = new ArrayList<LanguagesMetricModel.LanguageMetricRecord>();
 
         try (var it = commitsCountPerLanguageStateStore.all()) {
