@@ -2,8 +2,8 @@ package com.griddynamics.gridu.pbazhko.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
-import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
-import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.LanguagesMetricModel;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

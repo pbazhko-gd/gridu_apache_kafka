@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
-import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel.LanguageMetricRecord;
+import com.griddynamics.gridu.pbazhko.model.metrics.LanguagesMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.LanguagesMetricModel.LanguageMetricRecord;
 import com.griddynamics.gridu.pbazhko.stream.BaseGitHubCommitsMetricsTopology;
 import com.griddynamics.gridu.pbazhko.stream.factory.GitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;

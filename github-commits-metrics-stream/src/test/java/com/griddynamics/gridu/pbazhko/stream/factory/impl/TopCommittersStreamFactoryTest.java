@@ -1,7 +1,7 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
-import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel.CommitterMetricRecord;
+import com.griddynamics.gridu.pbazhko.model.metrics.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.CommitersMetricModel.CommitterMetricRecord;
 import com.griddynamics.gridu.pbazhko.stream.BaseGitHubCommitsMetricsTopology;
 import com.griddynamics.gridu.pbazhko.stream.factory.GitHubCommitsMetricsStreamFactory;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;

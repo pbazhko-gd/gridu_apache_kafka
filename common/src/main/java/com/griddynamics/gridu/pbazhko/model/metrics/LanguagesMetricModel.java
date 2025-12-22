@@ -1,4 +1,4 @@
-package com.griddynamics.gridu.pbazhko.model;
+package com.griddynamics.gridu.pbazhko.model.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

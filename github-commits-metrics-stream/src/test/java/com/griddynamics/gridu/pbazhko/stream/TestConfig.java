@@ -1,8 +1,8 @@
 package com.griddynamics.gridu.pbazhko.stream;
 
 import com.griddynamics.gridu.pbazhko.model.GitHubCommit;
-import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
-import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.LanguagesMetricModel;
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.streams.serdes.json.KafkaJsonSchemaSerde;
 import org.springframework.context.annotation.Bean;

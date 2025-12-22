@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.LanguagesMetricModel;
 import com.griddynamics.gridu.pbazhko.stream.factory.AbstractGitHubCommitsMetricsStreamFactory;
 import com.griddynamics.gridu.pbazhko.stream.processor.CommitsPerLanguageProcessor;
 import com.griddynamics.gridu.pbazhko.stream.processor.TopLanguagesProcessor;

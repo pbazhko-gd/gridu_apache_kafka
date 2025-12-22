@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.factory.impl;
 
-import com.griddynamics.gridu.pbazhko.model.CommitersMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.CommitersMetricModel;
 import com.griddynamics.gridu.pbazhko.stream.processor.CommitsPerAuthorProcessor;
 import com.griddynamics.gridu.pbazhko.stream.processor.TopCommittersProcessor;
 import com.griddynamics.gridu.pbazhko.stream.factory.AbstractGitHubCommitsMetricsStreamFactory;

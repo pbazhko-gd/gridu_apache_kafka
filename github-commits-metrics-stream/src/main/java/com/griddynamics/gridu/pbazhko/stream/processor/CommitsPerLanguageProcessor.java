@@ -1,6 +1,6 @@
 package com.griddynamics.gridu.pbazhko.stream.processor;
 
-import com.griddynamics.gridu.pbazhko.model.LanguagesMetricModel;
+import com.griddynamics.gridu.pbazhko.model.metrics.LanguagesMetricModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.processor.api.Processor;

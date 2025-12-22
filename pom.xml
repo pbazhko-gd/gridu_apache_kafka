@@ -39,6 +39,7 @@
         <module>github-accounts-publish-app</module>
         <module>github-commits-publisher</module>
         <module>github-commits-metrics-stream</module>
+        <module>github-commits-metrics-sink</module>
     </modules>
 
     <repositories>
