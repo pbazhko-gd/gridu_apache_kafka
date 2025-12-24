@@ -35,11 +35,11 @@
     <modules>
         <module>common</module>
         <module>common-tests</module>
-        <module>github-accounts-connect-source</module>
         <module>github-accounts-publish-app</module>
-        <module>github-commits-publisher</module>
-        <module>github-commits-metrics-stream</module>
-        <module>github-commits-metrics-sink</module>
+        <module>github-commits-publish-app</module>
+        <module>github-commits-metrics-streams</module>
+        <module>github-accounts-connect-source</module>
+        <module>github-commits-metrics-connect-sink</module>
     </modules>
 
     <repositories>

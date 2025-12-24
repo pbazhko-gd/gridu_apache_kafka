@@ -1,0 +1,55 @@
+@startuml
+title GitHub Commits Pipeline
+
+package "Kafka Topics" #d9ffdf {
+    rectangle "github-accounts" as kafka_topic_github_accounts #4DE364
+    rectangle "github-commits" as kafka_topic_github_commits #4DE364
+
+    rectangle "top-languages" as kafka_topic_top_languages #4DE364
+    rectangle "top-committers" as kafka_topic_top_committers #4DE364
+    rectangle "github-commits-per-author" as kafka_topic_github_commits_per_author #4DE364
+    rectangle "github-commits-per-language" as kafka_topic_github_commits_per_language #4DE364
+    rectangle "github-commits-total-count" as kafka_topic_github_commits_total_count #4DE364
+    rectangle "github-committers-total-count" as kafka_topic_github_committers_total_count #4DE364
+}
+
+package "Kafka connect instance"{
+    rectangle "confluentinc/cp-kafka-connect" <<kafka-connect-source>> as kafka_connect_source
+    rectangle "confluentinc/cp-kafka-connect" <<kafka-connect-sink>> as kafka_connect_sink
+}
+
+artifact "source (text file)" <<github-accounts.txt>> as txtfile #FFFFFF
+artifact "source (text file)" <<top-languages.json>> as txtfile #FFFFFF
+
+cloud "schema registry" <<http://schema-registry:8081>> as schema_registry
+
+component "java application (kafka producer)" <<github-accounts-publish-app>> as github_accounts_publish_app
+component "java application (consumer and producer)" <<github-commits-publisher>> as github_commits_publisher
+component "java application (kafka-streams)" <<github-commits-metrics-streams>> as github_commits_metrics_streams
+
+database "redis" <<сache>> as redis
+cloud "external" <<GitHub API>> as github_api
+
+txtfile --> github_accounts_publish_app : accounts list
+txtfile --> kafka_connect_source : accounts list
+
+github_accounts_publish_app --> kafka_topic_github_accounts : github-accounts (JSON)
+github_accounts_publish_app --> schema_registry : github-accounts JSON schema
+
+kafka_connect_source --> kafka_topic_github_accounts : github-accounts (JSON)
+kafka_connect_source --> schema_registry : GitHub account JSON schema
+
+kafka_topic_github_accounts --> github_commits_publisher : GitHub accounts
+github_commits_publisher --> kafka_topic_github_commits : GitHub commits
+github_commits_publisher --> redis : commits languages cache
+github_commits_publisher --> github_api : HTTP
+github_commits_publisher --> schema_registry : GitHub commit JSON schema
+
+kafka_topic_github_commits --> github_commits_metrics_streams : GitHub commits
+github_commits_metrics_streams --> kafka_topic_top_committers : Top committers metric
+github_commits_metrics_streams --> kafka_topic_top_languages : Top languages metric
+github_commits_metrics_streams --> kafka_topic_github_commits_per_author : Commits count per author metric
+github_commits_metrics_streams --> kafka_topic_github_commits_per_language : Commits count per language metric
+github_commits_metrics_streams --> kafka_topic_github_commits_total_count : Total commits count metric
+github_commits_metrics_streams --> kafka_topic_github_committers_total_count : Total committers count metric
+@enduml

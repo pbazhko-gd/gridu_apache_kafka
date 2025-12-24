@@ -18,8 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.stream.StreamSupport;
@@ -34,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GitHubAccountsPublishingServiceTest extends BaseKafkaTestContainerTest {
 
     public static final String TOPIC = "test-github-accounts";
+    public static final String SCHEMA = "github-account-schema.json";
 
     @Autowired
     private GitHubAccountsPublishingService gitHubAccountsPublishingService;
@@ -43,10 +43,19 @@ class GitHubAccountsPublishingServiceTest extends BaseKafkaTestContainerTest {
     @BeforeAll
     static void setup() throws IOException, InterruptedException, URISyntaxException {
         createTopic(TOPIC);
-        var schema = Files.readString(
-            Paths.get(GitHubAccountsPublishingServiceTest.class.getClassLoader()
-                .getResource("github-account-schema.json").toURI()));
-        createSchema(schema, TOPIC);
+
+        try (var is = GitHubAccountsPublishingServiceTest.class
+            .getClassLoader()
+            .getResourceAsStream(SCHEMA)
+        ) {
+            if (is == null) {
+                throw new IllegalStateException("Resource " + SCHEMA + " not found");
+            }
+
+            var schema = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            createSchema(schema, TOPIC);
+        }
+
         kafkaConsumer = getConsumer(TOPIC, GitHubAccount.class);
     }
 
